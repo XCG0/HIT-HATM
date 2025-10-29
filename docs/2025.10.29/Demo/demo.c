@@ -182,7 +182,7 @@ void drop_table(PGconn *conn)
 
 int main()
 {
-    const char *conninfo = "dbname=postgres port=5432 host='127.0.0.1' user='omm' password='omm_12345'";
+    const char *conninfo = "dbname=postgres port=5432 host='127.0.0.1' user='omm' password='omm_1234'";
     PGconn *conn = PQconnectdb(conninfo);
 
     if (PQstatus(conn) != CONNECTION_OK)

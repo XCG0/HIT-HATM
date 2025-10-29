@@ -79,7 +79,15 @@ rm -rf /home/omm/data/base/pgsql_tmp/* 2>/dev/null
 echo "清理下载的安装包..."
 rm -rf /root/*.tar.gz /root/*.zip /root/*.rpm
 
-# 11. 统计清理效果
+# 11. 清理 git 配置和缓存
+echo "清理 git 配置和缓存..."
+git config --global --unset credential.helper 2>/dev/null
+git config --global --unset user.name 2>/dev/null
+git config --global --unset user.email 2>/dev/null
+rm -rf /root/.gitconfig 2>/dev/null
+rm -rf /root/.git-credential-cache 2>/dev/null
+
+# 12. 统计清理效果
 echo ""
 echo "========== 清理完成 =========="
 echo "当前磁盘使用情况："

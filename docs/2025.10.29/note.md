@@ -57,7 +57,7 @@
 # 本地连接数据库
 gsql -d postgres -p 5432
 # 远程连接数据库
-gsql -h 127.0.0.1 -d postgres -p 5432 -U omm -W omm_12345
+gsql -h 127.0.0.1 -d postgres -p 5432 -U omm -W omm_1234
 
 # 第一次使用数据库，必须修改omm用户密码。
 alter role omm identified by ‘新密码’ replace ‘旧密码’;

@@ -98,7 +98,7 @@ int main(int argc, char **argv)
     if (argc > 1)
         conninfo = argv[1];
     else
-        conninfo = "dbname=postgres port=5432 host='127.0.0.1' application_name=test connect_timeout=5 user='omm' password='omm_12345'";
+        conninfo = "dbname=postgres port=5432 host='127.0.0.1' application_name=test connect_timeout=5 user='omm' password='omm_1234'";
 
     /* 和数据库建立连接 */
     conn = PQconnectdb(conninfo);

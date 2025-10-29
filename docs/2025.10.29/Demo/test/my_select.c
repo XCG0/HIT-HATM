@@ -12,7 +12,7 @@ void exit_with_error(PGconn *conn)
 int main()
 {
     // 数据库连接参数
-    const char *conninfo = "dbname=postgres port=5432 host='127.0.0.1' user='omm' password='omm_12345'";
+    const char *conninfo = "dbname=postgres port=5432 host='127.0.0.1' user='omm' password='omm_1234'";
 
     // 初始化数据库连接
     PGconn *conn = PQconnectdb(conninfo);

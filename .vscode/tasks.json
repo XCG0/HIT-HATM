@@ -1,18 +1,31 @@
 {
     "tasks": [
         {
+            "type": "shell",
+            "label": "创建 build 目录",
+            "command": "mkdir",
+            "args": [
+                "-p",
+                "build"
+            ],
+            "options": {
+                "cwd": "${fileDirname}"
+            },
+            "problemMatcher": []
+        },
+        {
             "type": "cppbuild",
             "label": "源文件编译",
             "command": "/usr/bin/g++",
             "args": [
-                "-g", // 添加调试信息
-                "-I/home/openGauss/openGauss-server/mppdb_temp_install/include", // 指定头文件路径
-                "-L/home/openGauss/openGauss-server/mppdb_temp_install/lib", // 指定库文件路径
-                "-Wl,-rpath,/home/openGauss/openGauss-server/mppdb_temp_install/lib", // 设置运行时库路径
-                "-lpq", // 链接 PostgreSQL 库
-                "${file}", // 源文件
+                "-g",
+                "-I/home/openGauss/openGauss-server/mppdb_temp_install/include",
+                "-L/home/openGauss/openGauss-server/mppdb_temp_install/lib",
+                "-Wl,-rpath,/home/openGauss/openGauss-server/mppdb_temp_install/lib",
+                "-lpq",
+                "${file}",
                 "-o",
-                "build/${fileBasenameNoExtension}", // 输出可执行文件至 build 目录
+                "build/${fileBasenameNoExtension}",
             ],
             "options": {
                 "cwd": "${fileDirname}"
@@ -24,7 +37,10 @@
                 "kind": "build",
                 "isDefault": true
             },
-            "detail": "编译 openGauss 客户端程序"
+            "detail": "编译 openGauss 客户端程序",
+            "dependsOn": [
+                "创建 build 目录"
+            ]
         },
     ],
     "version": "2.0.0"

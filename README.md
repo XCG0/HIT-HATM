@@ -16,26 +16,29 @@
 1. 在宿主机上拉取镜像
 
     ```bash
-    # 使用 CentOS 7.6 版本
-    docker pull xcg0/opengauss-centos_7.6.1810:v1.0
+    # 使用 Windows 版本
+    docker pull xcg0/opengauss-openeuler_22.03_x86:v1.0
 
-    # 或者使用 openEuler 22.03-lts 版本
-    docker pull xcg0/opengauss-openeuler_22.03-lts:v1.0
+    # 使用 macOS 版本
+    docker pull xcg0/opengauss-openeuler_22.03_aarch64:v1.0
     ```
-
-    > 如果**使用 CentOS 7.6**的版本，为了更方便的查看 docker 容器内的文件，建议**下载 VSCode 1.85.2 版本**。详细内容见 [VSCode 最新版本 Retome 远程 ssh 不兼容旧服务器问题（方法三）](https://blog.csdn.net/T_X_Parallel/article/details/142861435)。
-    >
-    > 如果**使用 openEuler 22.03-lts 的版本，则不受此影响**。
 
 2. 在宿主机上启动容器（注意替换 `--name` 与 `--hostname` 参数）
 
     ```bash
+    # 使用 Windows PowerShell 创建
+    docker run -itd --name opengauss-node0 `
+      --hostname node0 `
+      --privileged=true `
+      -p 127.0.0.1:5432:5432 `
+      xcg0/opengauss-openeuler_22.03_x86:v1.0 /bin/bash
+    
+    # 使用 macOS 创建
     docker run -itd --name opengauss-node0 \
       --hostname node0 \
       --privileged=true \
-      -p 5432:5432 \
-      xcg0/opengauss-openeuler_22.03-lts:v1.0
-      # xcg0/opengauss-centos_7.6.1810:v1.0
+      -p 127.0.0.1:5432:5432 \
+      xcg0/opengauss-openeuler_22.03-aarch64:v1.0 /bin/bash
     ```
 
 3. 使用 VS Code 连接容器，进入 `\home` 目录。
@@ -43,6 +46,16 @@
     ![VSCode 连接容器 1](images/image-1.png)
     ![VSCode 连接容器 2](images/image-2.png)
     > 在容器中的 root 用户下运行 `code ‘文件夹路径或文件路径’` 可以直接在 VSCode 中打开。
+
+    从 gitee 仓库中拉取代码：
+
+    ```shell
+    cd /home
+    git init
+    git remote add origin https://gitee.com/XuChGu/HIT-HADB.git # 添加远程仓库
+    git pull origin main
+    git checkout -f main
+    ```
 
     `\home` 目录结构（文件夹）如下，其中 **`\omm` 和 `\openGauss` 目录为数据库相关文件，由于体积较大，未包含在 Git 仓库中**：
 
@@ -58,20 +71,6 @@
         ├── data          # 数据库数据文件
         └── log           # 数据库日志文件
     ```
-
-    > 命令行进入容器参考：
-    > ```bash
-    > # 进入容器
-    > docker exec -it openGauss-node0 /bin/bash
-    >
-    > # 退出容器
-    > exit
-    > 
-    > # 查看容器状态
-    > docker ps -a
-    > ```
-
-
 
 ### 数据库启动
 
