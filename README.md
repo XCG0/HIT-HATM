@@ -25,20 +25,24 @@
 
 2. 在宿主机上启动容器（注意替换 `--name` 与 `--hostname` 参数）
 
-    ```bash
-    # 使用 Windows PowerShell 创建
+    ```powershell
+    # Windows PowerShell
     docker run -itd --name opengauss-node0 `
       --hostname node0 `
       --privileged=true `
       -p 127.0.0.1:5432:5432 `
-      xcg0/opengauss-openeuler_22.03_x86:v1.0 /bin/bash
-    
-    # 使用 macOS 创建
+      -v ${PWD}/init-container.sh:/init-container.sh:ro `
+      xcg0/opengauss-openeuler_22.03_x86:v1.0 `
+      bash /init-container.sh
+
+    # macOS / Linux
     docker run -itd --name opengauss-node0 \
       --hostname node0 \
       --privileged=true \
       -p 127.0.0.1:5432:5432 \
-      xcg0/opengauss-openeuler_22.03-aarch64:v1.0 /bin/bash
+      -v $(pwd)/init-container.sh:/init-container.sh:ro \
+      xcg0/opengauss-openeuler_22.03-aarch64:v1.0 \
+      bash /init-container.sh
     ```
 
 3. 使用 VS Code 连接容器，进入 `\home` 目录。
