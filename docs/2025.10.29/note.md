@@ -59,12 +59,12 @@ gsql -d postgres -p 5432
 # 远程连接数据库
 gsql -h 127.0.0.1 -d postgres -p 5432 -U omm -W omm_1234
 
-# 第一次使用数据库，必须修改omm用户密码。
-alter role omm identified by ‘新密码’ replace ‘旧密码’;
-# omm 用户可以直接修改自己及其他用户密码。
+# 第一次使用数据库，必须修改omm用户密码。（建议先修改加密方式，见 3.2. 第二步）
 alter user omm with password 'omm_1234';
+# omm 用户可以直接修改自己及其他用户密码。
+# alter role omm identified by ‘新密码’ replace ‘旧密码’;
 # 创建新用户
-create user test with password 'test_1234';
+# create user test with password 'test_1234';
 
 # --关闭密码修改设置。
 gs_guc reload -N all -I all -c "modify_initial_password = false" 

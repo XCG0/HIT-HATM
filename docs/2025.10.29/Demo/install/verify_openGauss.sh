@@ -27,24 +27,20 @@ else
   echo "omm 用户已存在，跳过创建步骤"
 fi
 
-chown -R omm:dbgrp /home/openGauss/openGauss-server
-
+# 创建数据目录和日志目录
+mkdir -p /home/omm/data /home/omm/log && chown -R omm:dbgrp /home/omm && ls -ld /home/omm/data /home/omm/log
 # ===== 切换到 omm 用户执行后续操作 =====
 
+su omm <<EOF
 
 # ===== 配置环境变量 =====
 
 # 建议写入 ~/.bashrc
-CODE_BASE=/home/openGauss/openGauss-server              # 修改为你的 openGauss-server 路径
-GAUSSHOME=$CODE_BASE/mppdb_temp_install
-export GAUSSHOME=/home/openGauss/openGauss-server/mppdb_temp_install/ ##编译结果的路径，可根据实际情况修改
+export CODE_BASE=/home/openGauss/openGauss-server
+export GAUSSHOME=$CODE_BASE/mppdb_temp_install
 export LD_LIBRARY_PATH=$GAUSSHOME/lib:$LD_LIBRARY_PATH
 export PATH=$GAUSSHOME/bin:$PATH
-export PATH=/bin:/usr/bin:/usr/local/bin:$PATH
 # source ~/.bashrc
-
-# 创建数据目录和日志目录
-mkdir -p /home/omm/data /home/omm/log
 
 # ===== 运行数据库 =====
 # 初始化数据库

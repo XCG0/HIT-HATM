@@ -13,17 +13,17 @@
 
 ### 创建 Docker 容器
 
-1. 在宿主机上拉取镜像
+1. 在宿主机上拉取镜像，[镜像仓库地址](https://hub.docker.com/repository/docker/xcg0/opengauss-openeuler_22.03/general)：
 
     ```bash
     # 使用 Windows 版本
-    docker pull xcg0/opengauss-openeuler_22.03_x86:v1.0
+    docker pull xcg0/opengauss-openeuler_22.03:x86_64
 
     # 使用 macOS 版本
-    docker pull xcg0/opengauss-openeuler_22.03_aarch64:v1.0
+    docker pull xcg0/opengauss-openeuler_22.03:aarch64
     ```
 
-2. 在宿主机上启动容器（注意替换 `--name` 与 `--hostname` 参数）
+2. 在宿主机上启动容器（注意替换 `--name` 与 `--hostname` 参数）：
 
     ```powershell
     # Windows PowerShell
@@ -32,7 +32,7 @@
       --privileged=true `
       -p 127.0.0.1:5432:5432 `
       -v ${PWD}/init-container.sh:/init-container.sh:ro `
-      xcg0/opengauss-openeuler_22.03_x86:v1.0 `
+      xcg0/opengauss-openeuler_22.03:x86_64 `
       bash /init-container.sh
 
     # macOS / Linux
@@ -41,25 +41,17 @@
       --privileged=true \
       -p 127.0.0.1:5432:5432 \
       -v $(pwd)/init-container.sh:/init-container.sh:ro \
-      xcg0/opengauss-openeuler_22.03-aarch64:v1.0 \
+      xcg0/opengauss-openeuler_22.03:aarch64 \
       bash /init-container.sh
     ```
 
 3. 使用 VS Code 连接容器，进入 `\home` 目录。
     
+    > **注意**：创建容器时会使用 init-container.sh 脚本在 `\home` 初始化 Git 仓库并拉取代码。如果不想继续跟踪后续代码，请删除 `/home/.git` 目录。
+    
     ![VSCode 连接容器 1](images/image-1.png)
     ![VSCode 连接容器 2](images/image-2.png)
     > 在容器中的 root 用户下运行 `code ‘文件夹路径或文件路径’` 可以直接在 VSCode 中打开。
-
-    从 gitee 仓库中拉取代码：
-
-    ```shell
-    cd /home
-    git init
-    git remote add origin https://gitee.com/XuChGu/HIT-HADB.git # 添加远程仓库
-    git pull origin main
-    git checkout -f main
-    ```
 
     `\home` 目录结构（文件夹）如下，其中 **`\omm` 和 `\openGauss` 目录为数据库相关文件，由于体积较大，未包含在 Git 仓库中**：
 
@@ -144,18 +136,18 @@
 
 ### C/C++ 简单调试
 
-> 直接使用 GDB 调试可以参考：
+> 直接使用 gdb 调试可以参考：
 > [使用 gdb 调试 openGauss5.0.0 入门篇](https://blog.csdn.net/qq_43893755/article/details/130682379)。
 
-- GDB 常见命令参考：
+- gdb 常见命令参考：
 
-  | 命令 | 说明 | VSCode 快捷键 |
-  | :---: | :---: | :---: |
-  | `-q ${executable_file}` | 启动 gdb 并加载可执行文件 | - |
-  | `c` | 继续执行程序 | 继续（F5） |
-  | `n` | 执行下一行代码，不进入函数 | 逐过程（F10） |
-  | `s` | 执行下一行代码，进入函数 | 单步调试（F11） |
-  | `finish` | 执行到当前函数返回 | 单步跳出（Shift+F11） |
+  | 功能 | gdb 命令 | VSCode 快捷键 |
+    | :---: | :---: | :---: |
+    | 启动 gdb，加载可执行文件 | `-q ${executable_file}` | - |
+    | 继续执行程序 | `c` | 继续（F5） |
+    | 执行下一行代码，不进入函数 | `n` | 逐过程（F10） |
+    | 执行下一行代码，进入函数 | `s` | 单步调试（F11） |
+    | 执行到当前函数返回 | `finish` | 单步跳出（Shift+F11） |
 
   ![VSCode 调试](images/image-3.png)
 

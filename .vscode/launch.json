@@ -5,11 +5,11 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "name": "编译+调试",
+            "name": "编译+调试客户端程序",
             "type": "cppdbg",
             /* 启动调试请求：
              * attach：附加到正在运行的进程；
-             * launchs：启动新进程进行调试。*/
+             * launch：启动新进程进行调试。*/
             "request": "launch",
             "program": "${fileDirname}/build/${fileBasenameNoExtension}", // build 目录下的可执行文件
             "args": [],
@@ -33,6 +33,36 @@
                 }
             ],
             "preLaunchTask": "源文件编译"
-        }
+        },
+        {
+            "name": "附加到 gaussdb 进程（内核调试）",
+            "type": "cppdbg",
+            "request": "attach",
+            "program": "/home/openGauss/openGauss-server/mppdb_temp_install/bin/gaussdb",
+            "processId": "${command:pickProcess}", // 手动选择要附加的进程
+            "MIMode": "gdb",
+            "miDebuggerPath": "/usr/bin/gdb",
+            "sourceFileMap": {
+                // 如果源码路径与编译时不一致，可以在这里映射
+                "/home/openGauss/openGauss-server": "/home/openGauss/openGauss-server"
+            },
+            "setupCommands": [
+                {
+                    "description": "启用 GDB 的 pretty-printing",
+                    "text": "-enable-pretty-printing",
+                    "ignoreFailures": true
+                },
+                {
+                    "description": "设置源码路径",
+                    "text": "directory /home/openGauss/openGauss-server",
+                    "ignoreFailures": false
+                },
+                {
+                    "description": "设置跟踪子进程（可选）",
+                    "text": "set follow-fork-mode child",
+                    "ignoreFailures": true
+                }
+            ]
+        },
     ]
 }

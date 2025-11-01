@@ -8,17 +8,13 @@ cd /home
 
 # 检查是否已经初始化过 Git 仓库
 if [ ! -d ".git" ]; then
-    echo ">>> 初始化 Git 仓库并拉取代码..."
     git init
-    git remote add origin https://gitee.com/XuChGu/HIT-HADB.git
-    git pull origin main
-    git checkout -f main
-    echo ">>> Git 仓库初始化完成"
-else
-    echo ">>> Git 仓库已存在，跳过初始化"
+    git remote add origin https://gitee.com/XuChGu/HIT-HADB.git 
+    git pull origin main  # 从远程 origin 的 main 分支拉取并合并最新代码
+    git checkout -f main  # 强制切换到 main 分支
+    code /home            # 启动 VS Code 编辑器，打开 /home 目录
 fi
 
-echo ">>> 容器初始化完成，启动 bash..."
 
 # 保持容器运行
 exec /bin/bash

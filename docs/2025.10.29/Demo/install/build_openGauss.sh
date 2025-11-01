@@ -49,7 +49,7 @@ rm -f binarylibs.tar.gz
 echo "[Step 3] 编译 openGauss..."
 cd $WORKDIR/openGauss-server
 sh build.sh -m release -3rd $WORKDIR/binarylibs
-rm -f $WORKDIR/binarylibs # 编译完成后删除 binarylibs 目录，节省空间
+rm -rf $WORKDIR/binarylibs # 编译完成后删除 binarylibs 目录，节省空间
 
 # ===== 4. 配置 root 环境变量 =====
 # openGauss 环境变量
