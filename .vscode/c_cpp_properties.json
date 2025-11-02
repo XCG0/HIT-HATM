@@ -2,32 +2,22 @@
     "configurations": [
         {
             "name": "Linux",
-            /* 包含路径：IntelliSense 引擎在查找头文件时会搜索这些路径
-             * 用于代码补全、错误检测、类型推断等智能感知功能 */
             "includePath": [
-                "${workspaceFolder}/**", // 工作区文件夹及其所有子文件夹
-                "/home/openGauss/openGauss-server/mppdb_temp_install/include" // openGauss 数据库的头文件安装路径
+                "${workspaceFolder}/**",
+                "/home/openGauss/openGauss-server/mppdb_temp_install/include"
             ],
             "defines": [],
             "compilerPath": "/usr/bin/g++",
             "cStandard": "c11",
             "cppStandard": "c++17",
             "intelliSenseMode": "linux-gcc-x64",
-            /* 标签解析器（Tag Parser）配置
-             * 用于符号浏览、"转到定义"、"查找所有引用"等导航功能
-             * 是 IntelliSense 的补充，使用更轻量级的符号索引 */
             "browse": {
-                /* 仅索引通过 includePath 包含的头文件中的符号
-                 * true: 提高性能，仅索引包含的头文件
-                 * false: 索引工作区的所有文件 */
                 "limitSymbolsToIncludedHeaders": true,
-                /* 符号浏览器将搜索这些路径中的符号 */
                 "path": [
-                    "/home/openGauss/openGauss-server/mppdb_temp_install/include" // openGauss 符号索引路径
+                    "/home/openGauss/openGauss-server/mppdb_temp_install/include"
                 ]
             }
         }
     ],
-    /* 配置文件格式版本号 */
     "version": 4
 }

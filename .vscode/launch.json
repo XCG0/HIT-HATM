@@ -42,10 +42,7 @@
             "processId": "${command:pickProcess}", // 手动选择要附加的进程
             "MIMode": "gdb",
             "miDebuggerPath": "/usr/bin/gdb",
-            "sourceFileMap": {
-                // 如果源码路径与编译时不一致，可以在这里映射
-                "/home/openGauss/openGauss-server": "/home/openGauss/openGauss-server"
-            },
+            "miDebuggerArgs": "-x ${workspaceFolder}/.gdbinit", // 加载 .gdbinit 文件
             "setupCommands": [
                 {
                     "description": "启用 GDB 的 pretty-printing",
@@ -53,16 +50,11 @@
                     "ignoreFailures": true
                 },
                 {
-                    "description": "设置源码路径",
-                    "text": "directory /home/openGauss/openGauss-server",
-                    "ignoreFailures": false
-                },
-                {
-                    "description": "设置跟踪子进程（可选）",
-                    "text": "set follow-fork-mode child",
+                    "description": "允许加载 .gdbinit 文件",
+                    "text": "-gdb-set auto-load safe-path /",
                     "ignoreFailures": true
                 }
             ]
-        },
+        }
     ]
 }
