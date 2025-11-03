@@ -142,18 +142,20 @@ readelf -S /home/openGauss/openGauss-server/mppdb_temp_install/bin/gaussdb | gre
 
 ### 常用调试场景
 
+> 可以点击链接跳转到断点所对应的代码位置。
+
 | 场景 | 关键断点 | 调试目标 | 示例 SQL |
 |------|---------|---------|---------|
-| **1. 查询执行流程** | `exec_simple_query()`<br>`pg_parse_query()`<br>`pg_plan_queries()`<br>`ExecutorRun()` | SQL 解析→优化→执行完整流程 | `INSERT INTO test VALUES (1, 'x');`<br>`SELECT * FROM test;` |
-| **2. 事务和 MVCC** | `StartTransaction()`<br>`GetTransactionSnapshot()`<br>`HeapTupleSatisfiesMVCC()`<br>`CommitTransaction()` | 快照隔离、可见性判断 | 两会话并发读写同一行 |
-| **3. 锁机制** | `LockAcquire()`<br>`LockRelease()`<br>`DeadLockCheck()`<br>`ProcSleep()` | 锁冲突、死锁检测 | 两会话交叉更新不同行 |
-| **4. 缓冲区管理** | `ReadBuffer()`<br>`BufferAlloc()`<br>`FlushBuffer()`<br>`StrategyGetBuffer()` | 页面读取、缓冲区替换策略 | 大表全表扫描 |
-| **5. 索引操作** | `_bt_search()`<br>`_bt_insert()`<br>`_bt_split()` | B-Tree 查找/插入/分裂 | `CREATE INDEX`<br>索引查询 |
-| **6. WAL 和恢复** | `XLogInsert()`<br>`XLogFlush()`<br>`StartupXLOG()`<br>`redo()` | 日志写入、崩溃恢复 | 模拟崩溃后重启 |
-| **7. 并发控制** | `heap_hot_search()`<br>`heap_page_prune()`<br>`vacuum_rel()` | HOT 更新、页面清理 | 频繁更新同一页数据 |
-| **8. 优化器决策** | `planner()`<br>`create_plan()`<br>`cost_seqscan()`<br>`cost_index()` | 执行计划生成、代价估算 | `EXPLAIN` 对比不同查询计划 |
-| **9. 内存管理** | `AllocSetAlloc()`<br>`MemoryContextReset()`<br>`MemoryContextDelete()` | 内存分配与释放 | 执行复杂查询观察内存 |
-| **10. 扩展功能** | `ExecCallTriggerFunc()`<br>`exec_stmt_execsql()`<br>`fmgr_info()` | 触发器、存储过程执行 | 创建并触发触发器 |
+| **1. 查询执行流程** | [`exec_simple_query()`](../../openGauss/openGauss-server/src/gausskernel/process/tcop/postgres.cpp#L2369)<br>[`pg_parse_query()`](../../openGauss/openGauss-server/src/gausskernel/process/tcop/postgres.cpp#L1010)<br>[`pg_plan_queries()`](../../openGauss/openGauss-server/src/gausskernel/process/tcop/postgres.cpp#L1485)<br>[`ExecutorRun()`](../../openGauss/openGauss-server/src/gausskernel/runtime/executor/execMain.cpp#L444) | SQL 解析→优化→执行完整流程 | `INSERT INTO test VALUES (1, 'x');`<br>`SELECT * FROM test;` |
+| **2. 事务和 MVCC** | [`StartTransaction()`](../../openGauss/openGauss-server/src/gausskernel/storage/access/transam/xact.cpp#L2307)<br>[`GetTransactionSnapshot()`](../../openGauss/openGauss-server/src/common/backend/utils/time/snapmgr.cpp#L479)<br>[`HeapTupleSatisfiesMVCC()`](../../openGauss/openGauss-server/src/gausskernel/storage/access/heap/heapam_visibility.cpp#L1026)<br>[`CommitTransaction()`](../../openGauss/openGauss-server/src/gausskernel/storage/access/transam/xact.cpp#L2583) | 快照隔离、可见性判断 | 两会话并发读写同一行 |
+| **3. 锁机制** | [`LockAcquire()`](../../openGauss/openGauss-server/src/gausskernel/storage/lmgr/lock.cpp#L533)<br>[`LockRelease()`](../../openGauss/openGauss-server/src/gausskernel/storage/lmgr/lock.cpp#L1860)<br>[`DeadLockCheck()`](../../openGauss/openGauss-server/src/gausskernel/storage/lmgr/deadlock.cpp#L191)<br>[`ProcSleep()`](../../openGauss/openGauss-server/src/gausskernel/storage/lmgr/proc.cpp#L1748) | 锁冲突、死锁检测 | 两会话交叉更新不同行 |
+| **4. 缓冲区管理** | [`ReadBuffer()`](../../openGauss/openGauss-server/src/gausskernel/storage/buffer/bufmgr.cpp#L1632)<br>[`BufferAlloc()`](../../openGauss/openGauss-server/src/gausskernel/storage/buffer/bufmgr.cpp#L354)<br>[`FlushBuffer()`](../../openGauss/openGauss-server/src/gausskernel/storage/buffer/bufmgr.cpp#L4664)<br>[`StrategyGetBuffer()`](../../openGauss/openGauss-server/src/gausskernel/storage/buffer/freelist.cpp#L180) | 页面读取、缓冲区替换策略 | 大表全表扫描 |
+| **5. 索引操作** | [`_bt_search()`](../../openGauss/openGauss-server/src/gausskernel/storage/access/nbtree/nbtsearch.cpp#L60)<br>[`_bt_split()`](../../openGauss/openGauss-server/src/gausskernel/storage/access/nbtree/nbtinsert.cpp#L74) | B-Tree 查找/分裂 | `CREATE INDEX`<br>索引查询 |
+| **6. WAL 和恢复** | [`XLogInsert()`](../../openGauss/openGauss-server/src/gausskernel/storage/access/transam/xloginsert.cpp#L505)<br>[`StartupXLOG()`](../../openGauss/openGauss-server/src/gausskernel/storage/access/transam/xlog.cpp#L8741) | 日志写入、崩溃恢复 | 模拟崩溃后重启 |
+| **7. 并发控制** | [`heap_hot_search()`](../../openGauss/openGauss-server/src/gausskernel/storage/access/heap/heapam.cpp#L2600)<br>[`heap_page_prune()`](../../openGauss/openGauss-server/src/gausskernel/storage/access/heap/pruneheap.cpp#L173)<br>[`vacuum_rel()`](../../openGauss/openGauss-server/src/gausskernel/optimizer/commands/vacuum.cpp#L130) | HOT 更新、页面清理 | 频繁更新同一页数据 |
+| **8. 优化器决策** | [`planner()`](../../openGauss/openGauss-server/src/gausskernel/optimizer/plan/planner.cpp#L370)<br>[`create_plan()`](../../openGauss/openGauss-server/src/gausskernel/optimizer/plan/createplan.cpp#L302)<br>[`cost_seqscan()`](../../openGauss/openGauss-server/src/gausskernel/optimizer/path/costsize.cpp#L640)<br>[`cost_index()`](../../openGauss/openGauss-server/src/gausskernel/optimizer/path/costsize.cpp#L976) | 执行计划生成、代价估算 | `EXPLAIN` 对比不同查询计划 |
+| **9. 内存管理** | [`MemoryContextReset()`](../../openGauss/openGauss-server/src/common/backend/utils/mmgr/mcxt.cpp#L215)<br>[`MemoryContextDelete()`](../../openGauss/openGauss-server/src/common/backend/utils/mmgr/mcxt.cpp#L364) | 内存分配与释放 | 执行复杂查询观察内存 |
+| **10. 扩展功能** | [`ExecCallTriggerFunc()`](../../openGauss/openGauss-server/src/gausskernel/optimizer/commands/trigger.cpp#L96)<br>[`exec_stmt_execsql()`](../../openGauss/openGauss-server/src/common/pl/plpgsql/src/pl_exec.cpp#L144)<br>[`fmgr_info()`](../../openGauss/openGauss-server/src/common/backend/utils/fmgr/fmgr.cpp#L246) | 触发器、存储过程执行 | 创建并触发触发器 |
 
 ### 查询执行流程调试示例
 
@@ -187,4 +189,4 @@ readelf -S /home/openGauss/openGauss-server/mppdb_temp_install/bin/gaussdb | gre
 >
 > VS Code 调试界面中也可以完成上述 GDB 命令操作，终端 1 可以使用 VS Code 调试界面，终端 2 使用 VS Code 内置终端即可。
 >
-> ![VS Code 调试 exec_simple_query](images/image-8.png)
+> ![VS Code 调试 exec_simple_query](../../images/image-8.png)
