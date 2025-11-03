@@ -86,6 +86,7 @@ cache/
 
 # 编译和构建产物
 *.o
+*.output
 *.so
 *.a
 *.out
