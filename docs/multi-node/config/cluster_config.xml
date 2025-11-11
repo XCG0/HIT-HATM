@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ROOT>
+    <!-- openGauss 集群配置 -->
+    <!-- 整体信息 -->
+    <CLUSTER>
+        <!-- 数据库名称 -->
+        <PARAM name="clusterName" value="openGaussCluster" />
+        <!-- 数据库节点名称(hostname) -->
+        <PARAM name="nodeNames" value="primary,standby1,standby2" />
+        <!-- 数据库安装目录 -->
+        <PARAM name="gaussdbAppPath" value="/home/openGauss/openGauss-server/mppdb_temp_install" />
+        <!-- 日志目录 -->
+        <PARAM name="gaussdbLogPath" value="/home/omm/log" />
+        <!-- 临时文件目录 -->
+        <PARAM name="tmpMppdbPath" value="/home/omm/tmp" />
+        <!-- 数据库工具目录 -->
+        <PARAM name="gaussdbToolPath" value="/home/openGauss/openGauss-server/mppdb_temp_install/bin" />
+        <!-- 数据库core文件目录 -->
+        <PARAM name="corePath" value="/home/omm/corefile" />
+        <!-- 节点IP，与nodeNames一一对应 -->
+        <PARAM name="backIp1s" value="172.18.0.10,172.18.0.11,172.18.0.12"/>
+    </CLUSTER>
+    
+    <!-- 每台服务器上的节点部署信息 -->
+    <!-- 主节点 -->
+    <DEVICELIST>
+        <DEVICE sn="1000001">
+            <!-- 主机名称 -->
+            <PARAM name="name" value="primary"/>
+            <!-- 节点所在的AZ及AZ优先级 -->
+            <PARAM name="azName" value="AZ1"/>
+            <PARAM name="azPriority" value="1"/>
+            <!-- 节点IP -->
+            <PARAM name="backIp1" value="172.18.0.10"/>
+            <!-- 数据库节点数据目录 -->
+            <PARAM name="dataNum" value="1"/>
+            <PARAM name="dataPortBase" value="26000"/>
+            <PARAM name="dataNode1" value="/home/omm/data/dn,standby1,/home/omm/data/dn,standby2,/home/omm/data/dn"/>
+        </DEVICE>
+        
+        <!-- 备节点1 -->
+        <DEVICE sn="1000002">
+            <PARAM name="name" value="standby1"/>
+            <PARAM name="azName" value="AZ1"/>
+            <PARAM name="azPriority" value="1"/>
+            <PARAM name="backIp1" value="172.18.0.11"/>
+            <PARAM name="dataNum" value="1"/>
+            <PARAM name="dataPortBase" value="26000"/>
+            <PARAM name="dataNode1" value="/home/omm/data/dn,primary,/home/omm/data/dn,standby2,/home/omm/data/dn"/>
+        </DEVICE>
+        
+        <!-- 备节点2 -->
+        <DEVICE sn="1000003">
+            <PARAM name="name" value="standby2"/>
+            <PARAM name="azName" value="AZ1"/>
+            <PARAM name="azPriority" value="1"/>
+            <PARAM name="backIp1" value="172.18.0.12"/>
+            <PARAM name="dataNum" value="1"/>
+            <PARAM name="dataPortBase" value="26000"/>
+            <PARAM name="dataNode1" value="/home/omm/data/dn,primary,/home/omm/data/dn,standby1,/home/omm/data/dn"/>
+        </DEVICE>
+    </DEVICELIST>
+</ROOT>
