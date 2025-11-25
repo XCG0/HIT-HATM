@@ -1,7 +1,5 @@
 # openGauss 部署方式对比: DCF vs 流复制
 
-## 概述
-
 当前项目使用的是 **基于流复制(Streaming Replication)的主备部署**，而文档中介绍的是 **基于 DCF (Distributed Consensus Framework) 的分布式一致性部署**。
 
 ---
