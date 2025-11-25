@@ -1,6 +1,6 @@
 # openGauss 使用说明
 
-> **📌 新增：[多节点集群部署指南](docs/multi-node/QUICKSTART.md)** - 一主两备高可用集群快速部署
+> **📌 新增：[多节点集群部署指南](#多节点集群部署)** - 一主多备高可用集群快速部署，支持一键自动部署
 
 ## 目录
 
@@ -10,6 +10,8 @@
   - [数据库启动](#数据库启动)
   - [在 VS Code 中调试 openGauss 数据库内核](#在-vs-code-中调试-opengauss-数据库内核)
 - [多节点集群部署](#多节点集群部署)
+  - [快速开始](#快速开始)
+  - [详细配置](#详细配置)
 
 ---
 
@@ -94,60 +96,17 @@
     gs_ctl start -D /home/omm/data -Z single_node -l /home/omm/log/opengauss.log
     ```
 
-    > 正常启动输出如下：
-    > 
-    > ```
-    > [2025-10-22 13:16:44.405][1532773][][gs_ctl]: gs_ctl started,datadir is /home/omm/data 
-    > [2025-10-22 13:16:44.572][1532773][][gs_ctl]: waiting for server to start...
-    > .
-    > [2025-10-22 13:16:46.570][1532773][][gs_ctl]:  done
-    > [2025-10-22 13:16:46.570][1532773][][gs_ctl]: server started (/home/omm/data)
-    > ```
-
-
 2. 查询数据库状态
 
     ```bash
     gs_ctl query -D /home/omm/data
     ```
 
-    > 状态正常时输出如下：
-    > 
-    > ```
-    > [2025-10-22 13:17:42.333][1533927][][gs_ctl]: gs_ctl query ,datadir is /home/omm/data 
-    >  HA state:           
-    >         local_role                     : Normal
-    >         static_connections             : 0
-    >         db_state                       : Normal
-    >         detail_information             : Normal
-    > 
-    >  Senders info:       
-    > No information 
-    >  Receiver info:      
-    > No information 
-    > ```
-
 3. 关闭数据库
 
     ```bash
     gs_ctl stop -D /home/omm/data
     ```
-
-    > 正常关闭时输出如下：
-    > 
-    > ```
-    > [2025-10-22 13:16:08.621][1531932][][gs_ctl]: gs_ctl stopped ,datadir is /home/omm/data 
-    > waiting for server to shut down...... done
-    > server stopped
-    > ```
-
-4. 使用 VSCode PostgreSQL 插件连接数据库：
-
-    在 PostgreSQL 插件中创建连接，连接类型选择 `PostgreSQL`，填写连接信息，保存并连接。
-
-    ![PostgreSQL 插件连接 openGauss](/images/image.png)
-
-    > 需要先启动数据库 `gs_ctl start ……`，才能连接成功。
 
 ### 在 VS Code 中调试 openGauss 数据库内核
 
@@ -214,35 +173,116 @@
 
 ## 多节点集群部署
 
-想要部署 openGauss 一主两备的高可用集群？请参考：
-
-📖 **[多节点集群快速部署指南](docs/multi-node/QUICKSTART.md)**
-
-### 特性
-
-- ✅ 一主两备架构
-- ✅ 自动主备复制
-- ✅ 故障自动切换
-- ✅ 数据同步验证
-- ✅ 完整的部署脚本
+```mermaid
+graph TB
+    subgraph Network["Docker 网络:172.18.0.0/16"]
+        Primary["🔷 opengauss-primary<br/>172.18.0.10:5432<br/>读写节点"]
+        
+        Standby1["🔶 opengauss-standby1<br/>172.18.0.11:5432<br/>只读备节点"]
+        Standby2["🔶 opengauss-standby2<br/>172.18.0.12:5432<br/>只读备节点"]
+        Standby3["🔶 opengauss-standby3<br/>172.18.0.13:5432<br/>只读备节点"]
+        StandbyN["🔶 opengauss-standbyN<br/>172.18.0.10+N:5432<br/>最多支持10个备节点"]
+        
+        Primary -->|"WAL 流复制<br/>异步/同步"| Standby1
+        Primary -->|"WAL 流复制<br/>异步/同步"| Standby2
+        Primary -->|"WAL 流复制<br/>异步/同步"| Standby3
+        Primary -.->|"WAL 流复制<br/>异步/同步"| StandbyN
+    end
+    
+    Host["🖥️ 宿主机<br/>Docker Engine"] -.->|"容器管理"| Network
+    Client["📱 应用客户端"] -->|"读写操作"| Primary
+    Client -.->|"只读查询"| Standby1
+    Client -.->|"只读查询"| Standby2
+    
+    style Primary fill:#e3f2fd,stroke:#1976d2,stroke-width:3px
+    style Standby1 fill:#fff3e0,stroke:#f57c00,stroke-width:2px
+    style Standby2 fill:#fff3e0,stroke:#f57c00,stroke-width:2px
+    style Standby3 fill:#fff3e0,stroke:#f57c00,stroke-width:2px
+    style StandbyN fill:#f3e5f5,stroke:#9c27b0,stroke-width:2px,stroke-dasharray: 5 5
+    style Network fill:#fafafa,stroke:#424242,stroke-width:1px
+    style Host fill:#e8f5e9,stroke:#388e3c,stroke-width:2px
+```
 
 ### 快速开始
 
-```powershell
-# Windows PowerShell
-cd docs\multi-node\scripts
-.\01_create_containers.ps1
+使用新的一键部署脚本 `multi-node.sh`，只需一条命令即可完成整个集群的自动部署：
 
-# 进入主节点容器
-docker exec -it opengauss-primary bash
+```bash
+# 在项目根目录执行
+cd scripts
 
-# 在容器内依次执行
-cd /home/scripts
-bash 02_setup_ssh.sh      # 配置 SSH 互信
-bash 03_init_cluster.sh   # 初始化集群
-bash 04_start_cluster.sh  # 启动集群
-bash 05_verify_cluster.sh # 验证集群
+# 一键自动部署（1主2备，ANY1模式）
+./multi-node.sh -y
+
+# 自定义配置（1主4备，ANY2模式，每步确认）
+./multi-node.sh -n 4 -m ANY2
+
+# 查看帮助
+./multi-node.sh -h
 ```
 
-详细说明和故障排查请参考 [完整文档](docs/multi-node/README.md)。
+| 参数 | 说明 | 默认值 | 示例 |
+|------|------|--------|------|
+| `-n NUMBER` | 备节点数量 (1-10) | 2 | `-n 4` (1主4备) |
+| `-m MODE` | 复制模式 | ANY1 | `-m ANY2` (任意2个同步) |
+| `-y` | 自动确认所有步骤 | 手动确认 | `-y` (无交互模式) |
+| `-h` | 显示帮助信息 | - | `-h` |
+
+> `-m` 可选的复制模式包括：
+> - `ANYN`：任意 N 个备库为同步，其他为异步
+> - `FIRSTN`：前 N 个备库为同步，其他为异步
+> - `SYNC`：任意 N 个备库为同步，其他为异
+> - `ASYNC`：所有备库均为异步
+
+
+如果需要更精细的控制或故障排查，可以手动执行各个步骤：
+
+```bash
+# 在 scripts 目录执行
+cd scripts/multi-node
+
+./01_create_containers.sh -n 4 # 步骤1: 创建容器 (必需)
+./02_setup_ssh.sh # 步骤2: 配置SSH (可选，但建议执行)
+./03_init_cluster.sh -m ANY2  # 步骤3: 初始化集群 (必需)
+./04_start_cluster.sh # 步骤4: 启动集群 (必需)
+./05_verify_cluster.sh # 步骤5: 验证集群 (建议)
+```
+
+#### 常用管理命令
+
+```bash
+# 查看集群状态
+docker exec opengauss-primary su - omm -c "gs_ctl query -D /home/omm/data"
+
+# 启动集群
+./scripts/multi-node/04_start_cluster.sh
+
+# 停止集群
+./scripts/multi-node/06_stop_cluster.sh
+
+# 清理环境
+docker stop $(docker ps -q -f name=opengauss)
+docker rm $(docker ps -aq -f name=opengauss)
+docker network rm opengauss-network
+```
+
+#### 高级配置
+
+```bash
+# 修改主节点配置以提升性能
+docker exec opengauss-primary su - omm -c "
+    gsql -d postgres -c \"
+        ALTER SYSTEM SET shared_buffers = '1GB';
+        ALTER SYSTEM SET max_connections = 500;
+        ALTER SYSTEM SET wal_buffers = '64MB';
+        SELECT pg_reload_conf();
+    \"
+"
+```
+
+> **📚 更多文档**
+> 
+> - [脚本详细说明](scripts/multi-node/README.md)
+> - [openGauss 官方文档](https://docs.opengauss.org/zh/)
+> - [Docker 部署最佳实践](https://docs.docker.com/engine/reference/builder/)
 

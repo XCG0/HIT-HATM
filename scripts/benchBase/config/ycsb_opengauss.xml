@@ -1,0 +1,76 @@
+<?xml version="1.0"?>
+<parameters>
+    <!-- 数据库基本配置 -->
+    <dbtype>postgres</dbtype>
+    <driver>org.postgresql.Driver</driver>
+    <url>jdbc:postgresql://192.168.1.10:5432/benchbase</url>
+    <username>benchbase_user</username>
+    <password>benchbase_pass</password>
+    
+    <!-- 连接配置 -->
+    <isolation>TRANSACTION_READ_COMMITTED</isolation>
+    <batchsize>100</batchsize>
+    
+    <!-- YCSB工作负载配置 -->
+    <scalefactor>1000000</scalefactor>  <!-- 100万条记录 -->
+    <terminals>32</terminals>  <!-- 32个并发客户端 -->
+    
+    <!-- 测试执行配置 -->
+    <works>
+        <work>
+            <time>600</time>  <!-- 测试时间：10分钟 -->
+            <rate>unlimited</rate>
+            <!-- Read,Update,Insert,Scan操作权重 -->
+            <weights>50,20,15,15</weights>
+        </work>
+    </works>
+    
+    <!-- YCSB操作配置 -->
+    <transactiontypes>
+        <transactiontype>
+            <name>ReadRecord</name>
+            <!-- 随机读取记录，测试点查询性能 -->
+        </transactiontype>
+        <transactiontype>
+            <name>UpdateRecord</name>
+            <!-- 随机更新记录，测试写性能 -->
+        </transactiontype>
+        <transactiontype>
+            <name>InsertRecord</name>
+            <!-- 插入新记录，测试插入性能 -->
+        </transactiontype>
+        <transactiontype>
+            <name>ScanRecord</name>
+            <!-- 范围扫描，测试范围查询性能 -->
+        </transactiontype>
+    </transactiontypes>
+    
+    <!-- YCSB特定配置 -->
+    <ycsb>
+        <!-- 字段长度配置 -->
+        <fieldlength>100</fieldlength>
+        <!-- 记录大小 -->
+        <recordcount>1000000</recordcount>
+        <!-- 操作数 -->
+        <operationcount>1000000</operationcount>
+        <!-- 读写比例 -->
+        <readproportion>0.5</readproportion>
+        <updateproportion>0.2</updateproportion>
+        <insertproportion>0.15</insertproportion>
+        <scanproportion>0.15</scanproportion>
+        <!-- 请求分布 -->
+        <requestdistribution>zipfian</requestdistribution>  <!-- 或uniform,latest -->
+    </ycsb>
+    
+    <!-- 多节点负载均衡配置（可选） -->
+    <!--
+    <load_balancing>
+        <read_nodes>
+            <node>jdbc:postgresql://192.168.1.11:5432/benchbase</node>
+            <node>jdbc:postgresql://192.168.1.12:5432/benchbase</node>
+        </read_nodes>
+        <write_node>jdbc:postgresql://192.168.1.10:5432/benchbase</write_node>
+        <strategy>round_robin</strategy>
+    </load_balancing>
+    -->
+</parameters>

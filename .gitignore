@@ -3,6 +3,10 @@ openGauss/*
 omm/*
 
 # ===== 跟踪特定文件夹 =====
+.vscode/settings.json
+.vscode/extensions.json
+.vscode/launch.json
+
 !openGauss/openGauss-server/
 openGauss/openGauss-server/*
 !openGauss/openGauss-server/src
@@ -38,6 +42,7 @@ desktop.ini
 
 # 编辑器和 IDE
 # .vscode/
+.vscode/*
 .idea/
 *.swp
 *.swo
