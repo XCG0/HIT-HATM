@@ -1,0 +1,53 @@
+<?xml version="1.0"?>
+<parameters>
+
+    <!-- 连接信息 -->
+    <type>POSTGRES</type>
+    <driver>org.postgresql.Driver</driver>
+    <!-- 连接到 openGauss Primary 主节点 -->
+    <!-- 数据库: benchbase_db, 用户: benchbase, 密码: benchbase@123 (MD5加密) -->
+    <url>jdbc:postgresql://172.18.0.10:5432/benchbase_db?amp;reWriteBatchedInserts=true&amp;assumeMinServerVersion=9.0&amp;gssEncMode=disable</url>
+    <username>benchbase</username>
+    <password>benchbase@123</password>
+    <reconnectOnConnectionFailure>true</reconnectOnConnectionFailure>
+    <isolation>TRANSACTION_SERIALIZABLE</isolation>
+    <batchsize>128</batchsize>
+
+    <!-- 扩展因子决定订阅用户数量 -->
+    <scalefactor>1</scalefactor>
+
+    <!-- 工作负载 -->
+    <terminals>1</terminals>
+    <works>
+        <work>
+            <time>60</time>
+            <rate>10000</rate>
+            <weights>2, 35, 10, 35, 2, 14, 2</weights>
+        </work>
+    </works>
+
+    <!-- TATP 事务声明 -->
+    <transactiontypes>
+        <transactiontype>
+            <name>DeleteCallForwarding</name>
+        </transactiontype>
+        <transactiontype>
+            <name>GetAccessData</name>
+        </transactiontype>
+        <transactiontype>
+            <name>GetNewDestination</name>
+        </transactiontype>
+        <transactiontype>
+            <name>GetSubscriberData</name>
+        </transactiontype>
+        <transactiontype>
+            <name>InsertCallForwarding</name>
+        </transactiontype>
+        <transactiontype>
+            <name>UpdateLocation</name>
+        </transactiontype>
+        <transactiontype>
+            <name>UpdateSubscriberData</name>
+        </transactiontype>
+    </transactiontypes>
+</parameters>

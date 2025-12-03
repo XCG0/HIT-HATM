@@ -1,6 +1,6 @@
 # openGauss 主备集群部署指南
 
-> 🚀 **一键部署 | 动态扩展 | 多种复制模式**  
+> 🚀 **一键部署 | 动态扩展 | 多种复制模式**
 > 基于 Docker 容器的 openGauss 高可用集群快速部署方案
 
 [![openGauss](https://img.shields.io/badge/openGauss-3.x-blue)](https://opengauss.org/)
@@ -38,26 +38,27 @@ cd scripts
 ### 手动部署
 
 ```mermaid
-graph LR
-    A[01_创建容器] --> B[02_SSH互信]
-    B --> C[03_初始化集群]
-    C --> D[04_启动集群]
-    D --> E[05_验证集群]
-    
-    style A fill:#e3f2fd
-    style B fill:#e8f5e9
-    style C fill:#fff3e0
-    style D fill:#fce4ec
-    style E fill:#f3e5f5
+flowchart LR
+    A["初始化环境\n（01_create_containers.sh）"] --> B["配置 SSH 互信\n（02_setup_ssh.sh）"]
+    B --> C["初始化集群参数\n（03_init_cluster.sh）"]
+    C --> D["启动数据库集群\n（04_start_cluster.sh）"]
+    D --> E["验证集群状态\n（05_verify_cluster.sh）"]
+
+    style A fill:#E3F2FD
+    style B fill:#FFF3E0
+    style C fill:#E8F5E9
+    style D fill:#F3E5F5
+    style E fill:#FFFDE7
+
 ```
 
-| 步骤 | 脚本 | 参数 | 说明 |
-|------|------|------|------|
-| 1 | `01_create_containers.sh` | `-n N` | 创建容器（1主N备，N=1-10） |
-| 2 | `02_setup_ssh.sh` | 无 | 配置SSH互信（可选） |
-| 3 | `03_init_cluster.sh` | `-m MODE` | 初始化并配置复制模式 |
-| 4 | `04_start_cluster.sh` | 无 | 启动所有节点 |
-| 5 | `05_verify_cluster.sh` | 无 | 验证集群状态 |
+| 步骤 | 脚本                        | 参数        | 说明                       |
+| ---- | --------------------------- | ----------- | -------------------------- |
+| 1    | `01_create_containers.sh` | `-n N`    | 创建容器（1主N备，N=1-10） |
+| 2    | `02_setup_ssh.sh`         | 无          | 配置SSH互信（可选）        |
+| 3    | `03_init_cluster.sh`      | `-m MODE` | 初始化并配置复制模式       |
+| 4    | `04_start_cluster.sh`     | 无          | 启动所有节点               |
+| 5    | `05_verify_cluster.sh`    | 无          | 验证集群状态               |
 
 **示例：**
 
@@ -70,7 +71,6 @@ cd scripts/multi-node
 ./04_start_cluster.sh              # 启动集群
 ./05_verify_cluster.sh             # 验证状态
 ```
-
 
 ### 关键配置文件
 
@@ -136,19 +136,19 @@ recovery_target_timeline = 'latest'
 graph TB
     subgraph Docker["Docker 网络 (172.18.0.0/16)"]
         Primary["<b>主节点</b><br/>opengauss-primary<br/>172.18.0.10:5432"]
-        
+  
         Standby1["<b>备节点1</b><br/>opengauss-standby1<br/>172.18.0.11:5432"]
         Standby2["<b>备节点2</b><br/>opengauss-standby2<br/>172.18.0.12:5432"]
         StandbyN["<b>备节点N</b><br/>opengauss-standbyN<br/>172.18.0.10+N:5432"]
-        
+  
         Primary -->|"WAL复制+心跳"| Standby1
         Primary -->|"WAL复制+心跳"| Standby2
         Primary -.->|"最多10个备节点"| StandbyN
     end
-    
+  
     Client["应用客户端"] -->|"读写"| Primary
     Client -.->|"只读"| Standby1
-    
+  
     style Primary fill:#e3f2fd,stroke:#1976d2,stroke-width:3px
     style Standby1 fill:#fff3e0,stroke:#f57c00,stroke-width:2px
     style Standby2 fill:#fff3e0,stroke:#f57c00,stroke-width:2px
@@ -157,12 +157,12 @@ graph TB
 
 ### 节点配置表
 
-| 节点 | 容器名 | IP地址 | 内部端口 | 宿主机端口 | 角色 |
-|------|--------|--------|---------|-----------|------|
-| 主节点 | `opengauss-primary` | 172.18.0.10 | 5432 | 15432 | 读写 |
-| 备节点1 | `opengauss-standby1` | 172.18.0.11 | 5432 | 15433 | 只读 |
-| 备节点2 | `opengauss-standby2` | 172.18.0.12 | 5432 | 15434 | 只读 |
-| 备节点N | `opengauss-standbyN` | 172.18.0.10+N | 5432 | 15432+N | 只读 |
+| 节点    | 容器名                 | IP地址        | 内部端口 | 宿主机端口 | 角色 |
+| ------- | ---------------------- | ------------- | -------- | ---------- | ---- |
+| 主节点  | `opengauss-primary`  | 172.18.0.10   | 5432     | 15432      | 读写 |
+| 备节点1 | `opengauss-standby1` | 172.18.0.11   | 5432     | 15433      | 只读 |
+| 备节点2 | `opengauss-standby2` | 172.18.0.12   | 5432     | 15434      | 只读 |
+| 备节点N | `opengauss-standbyN` | 172.18.0.10+N | 5432     | 15432+N    | 只读 |
 
 **脚本参考：** `01_create_containers.sh` 第 64-104 行
 
@@ -177,24 +177,24 @@ graph TB
         P_R2[复制2<br/>5436]
         P_H2[心跳2<br/>5437]
     end
-    
+  
     subgraph S1["备节点1 172.18.0.11"]
         S1_DB[数据库<br/>5432]
         S1_R[复制<br/>5434]
         S1_H[心跳<br/>5435]
     end
-    
+  
     subgraph S2["备节点2 172.18.0.12"]
         S2_DB[数据库<br/>5432]
         S2_R[复制<br/>5436]
         S2_H[心跳<br/>5437]
     end
-    
+  
     P_R1 <-->|WAL数据| S1_R
     P_H1 <-->|健康检查| S1_H
     P_R2 <-->|WAL数据| S2_R
     P_H2 <-->|健康检查| S2_H
-    
+  
     style Primary fill:#e3f2fd
     style S1 fill:#fff3e0
     style S2 fill:#fff3e0
@@ -208,12 +208,12 @@ graph TB
 心跳端口 = 5435 + i × 2
 ```
 
-| 备节点 | 索引i | 复制端口 | 心跳端口 |
-|--------|-------|---------|---------|
-| standby1 | 0 | 5434 | 5435 |
-| standby2 | 1 | 5436 | 5437 |
-| standby3 | 2 | 5438 | 5439 |
-| standbyN | N-1 | 5434+(N-1)×2 | 5435+(N-1)×2 |
+| 备节点   | 索引i | 复制端口      | 心跳端口      |
+| -------- | ----- | ------------- | ------------- |
+| standby1 | 0     | 5434          | 5435          |
+| standby2 | 1     | 5436          | 5437          |
+| standby3 | 2     | 5438          | 5439          |
+| standbyN | N-1   | 5434+(N-1)×2 | 5435+(N-1)×2 |
 
 ---
 
@@ -223,14 +223,14 @@ graph TB
 
 ### 模式对比
 
-| 模式 | 配置语法 | 同步节点数 | 性能 | 可靠性 | 适用场景 |
-|------|---------|-----------|------|--------|----------|
-| **ANY1** | `ANY 1(...)` | 任意1个 | ⚡⚡⚡ | ⭐⭐⭐ | **生产推荐** |
-| **ANY2** | `ANY 2(...)` | 任意2个 | ⚡⚡ | ⭐⭐⭐⭐ | 金融/关键业务 |
-| **FIRST1** | `FIRST 1(...)` | 第1个 | ⚡⚡⚡ | ⭐⭐⭐ | 固定拓扑 |
-| **FIRST2** | `FIRST 2(...)` | 前2个 | ⚡⚡ | ⭐⭐⭐⭐ | 跨机房 |
-| **SYNC** | `ANY N(...)` | 全部 | ⚡ | ⭐⭐⭐⭐⭐ | 极高可靠性 |
-| **ASYNC** | `''` (空) | 0 | ⚡⚡⚡⚡ | ⭐⭐ | 性能优先 |
+| 模式             | 配置语法         | 同步节点数 | 性能     | 可靠性     | 适用场景           |
+| ---------------- | ---------------- | ---------- | -------- | ---------- | ------------------ |
+| **ANY1**   | `ANY 1(...)`   | 任意1个    | ⚡⚡⚡   | ⭐⭐⭐     | **生产推荐** |
+| **ANY2**   | `ANY 2(...)`   | 任意2个    | ⚡⚡     | ⭐⭐⭐⭐   | 金融/关键业务      |
+| **FIRST1** | `FIRST 1(...)` | 第1个      | ⚡⚡⚡   | ⭐⭐⭐     | 固定拓扑           |
+| **FIRST2** | `FIRST 2(...)` | 前2个      | ⚡⚡     | ⭐⭐⭐⭐   | 跨机房             |
+| **SYNC**   | `ANY N(...)`   | 全部       | ⚡       | ⭐⭐⭐⭐⭐ | 极高可靠性         |
+| **ASYNC**  | `''` (空)      | 0          | ⚡⚡⚡⚡ | ⭐⭐       | 性能优先           |
 
 **脚本实现：** `03_init_cluster.sh` 第 69-84 行
 
@@ -264,25 +264,25 @@ sequenceDiagram
     participant S1 as 备节点1
     participant S2 as 备节点2
     participant S3 as 备节点3
-    
+  
     C->>P: COMMIT
     P->>P: 写入本地WAL
-    
+  
     par 并行发送
         P->>S1: 发送WAL
         P->>S2: 发送WAL
         P->>S3: 发送WAL
     end
-    
+  
     par 等待最快的N个
         S1-->>P: ✓ ACK (快)
         S2-->>P: ✓ ACK (快)
         Note over S3: 较慢，不等待
     end
-    
+  
     P->>C: ✓ COMMIT成功
     S3->>S3: 稍后应用WAL
-    
+  
     Note over P,S2: ANY 2: 收到2个确认即提交<br/>动态选择最快的节点
 ```
 
@@ -295,24 +295,24 @@ sequenceDiagram
     participant S1 as 备节点1(优先级1)
     participant S2 as 备节点2(优先级2)
     participant S3 as 备节点3(优先级3)
-    
+  
     C->>P: COMMIT
     P->>P: 写入WAL
-    
+  
     par 并行发送
         P->>S1: 发送WAL
         P->>S2: 发送WAL
         P->>S3: 发送WAL
     end
-    
+  
     par 必须等待前2个
         S1-->>P: ✓ ACK (优先级1)
         S2-->>P: ✓ ACK (优先级2)
         Note over S3: 优先级3，不等待
     end
-    
+  
     P->>C: ✓ COMMIT成功
-    
+  
     Note over P,S2: FIRST 2: 必须等待优先级最高的2个<br/>如果S1或S2故障会阻塞
 ```
 
@@ -320,12 +320,12 @@ sequenceDiagram
 
 **脚本验证：** `05_verify_cluster.sh` 第 76-88 行
 
-| 状态 | 含义 | 阻塞事务 | 参考 |
-|------|------|---------|------|
-| `Quorum` | 法定人数模式 | ✅ | [[7]](#ref7) |
-| `Sync` | 同步模式 | ✅ | [[6]](#ref6) |
-| `Potential` | 潜在同步节点 | ❌ | [[1]](#ref1) |
-| `Async` | 异步复制 | ❌ | [[6]](#ref6) |
+| 状态          | 含义         | 阻塞事务 | 参考      |
+| ------------- | ------------ | -------- | --------- |
+| `Quorum`    | 法定人数模式 | ✅       | [[7]](#ref7) |
+| `Sync`      | 同步模式     | ✅       | [[6]](#ref6) |
+| `Potential` | 潜在同步节点 | ❌       | [[1]](#ref1) |
+| `Async`     | 异步复制     | ❌       | [[6]](#ref6) |
 
 ---
 
@@ -384,27 +384,27 @@ SELECT now() - pg_last_xact_replay_timestamp() AS 延迟;
 ```mermaid
 stateDiagram-v2
     [*] --> Normal: 集群启动
-    
+  
     Normal --> 检测故障: 心跳超时(30s)
     检测故障 --> 备节点故障: 备节点无响应
     检测故障 --> 主节点故障: 主节点无响应
-    
+  
     备节点故障 --> 自动切换: ANY模式自动选择其他节点
     自动切换 --> Normal: 切换完成
-    
+  
     主节点故障 --> 手动提升: gs_ctl promote
     手动提升 --> Normal: 新主节点运行
-    
+  
     Note right of 自动切换: 应用无感知<br/>自动完成
     Note right of 手动提升: 需人工介入<br/>或使用自动化工具
 ```
 
-| 故障类型 | 检测方式 | 检测时间 | 系统响应 |
-|---------|---------|---------|---------|
-| 备节点宕机 | 心跳+TCP | ~30s | ANY模式自动切换[[3]](#ref3) |
-| 主节点宕机 | 备节点检测 | ~60s | 需手动提升备节点 |
-| 网络中断 | 心跳超时 | ~30s | 标记为disconnected |
-| 复制延迟 | WAL发送超时 | 60s | 事务阻塞或降级 |
+| 故障类型   | 检测方式    | 检测时间 | 系统响应                 |
+| ---------- | ----------- | -------- | ------------------------ |
+| 备节点宕机 | 心跳+TCP    | ~30s     | ANY模式自动切换[[3]](#ref3) |
+| 主节点宕机 | 备节点检测  | ~60s     | 需手动提升备节点         |
+| 网络中断   | 心跳超时    | ~30s     | 标记为disconnected       |
+| 复制延迟   | WAL发送超时 | 60s      | 事务阻塞或降级           |
 
 ---
 
@@ -428,12 +428,12 @@ replconninfo1 = 'localhost=172.18.0.11 localport=5434 localheartbeatport=5435
                  remoteheartbeatport=5435 remoteservice=5432'
 ```
 
-| 参数 | 说明 | 主节点示例 | 备节点示例 |
-|------|------|-----------|-----------|
-| `localhost` | 本地IP | 172.18.0.10 | 172.18.0.11 |
-| `localport` | WAL复制端口 | 5434 | 5434 |
-| `localheartbeatport` | 心跳端口 | 5435 | 5435 |
-| `remotehost` | 对端IP | 172.18.0.11 | 172.18.0.10 |
+| 参数                   | 说明        | 主节点示例  | 备节点示例  |
+| ---------------------- | ----------- | ----------- | ----------- |
+| `localhost`          | 本地IP      | 172.18.0.10 | 172.18.0.11 |
+| `localport`          | WAL复制端口 | 5434        | 5434        |
+| `localheartbeatport` | 心跳端口    | 5435        | 5435        |
+| `remotehost`         | 对端IP      | 172.18.0.11 | 172.18.0.10 |
 
 ### Docker 网络配置
 
@@ -462,71 +462,52 @@ graph LR
     B --> C[收集公钥]
     C --> D[分发到所有节点]
     D --> E[配置免密登录]
-    
+  
     style A fill:#e3f2fd
     style E fill:#e8f5e9
 ```
 
 **作用：**
+
 - ✅ 方便节点间手动管理
 - ✅ 某些工具需要SSH连接
 - ⚠️ 对集群复制非必需（复制使用TCP直连）
 
-### 性能优化参数
-
-**脚本参考：** `03_init_cluster.sh` 第 170-175 行
-
 ## 🔗 参考文献
 
-<a id="ref1"></a>
-**[1]** openGauss 社区. "openGauss 数据库文档". Gitee openGauss Docs. https://gitee.com/opengauss/docs  
+[1] openGauss 社区. "openGauss 数据库文档". Gitee openGauss Docs. https://gitee.com/opengauss/docs
 _说明：openGauss 官方文档托管在 Gitee，包含完整的技术文档和开发指南_
 
-<a id="ref2"></a>
-**[2]** PostgreSQL Global Development Group. "Write-Ahead Logging (WAL)". PostgreSQL 16 Documentation. https://www.postgresql.org/docs/current/wal-intro.html
+[2] PostgreSQL Global Development Group. "Write-Ahead Logging (WAL)". PostgreSQL 16 Documentation. https://www.postgresql.org/docs/current/wal-intro.html
 
-<a id="ref3"></a>
-**[3]** openGauss 社区. "openGauss 技术架构". openGauss 官网. https://opengauss.org/zh/  
+[3] openGauss 社区. "openGauss 技术架构". openGauss 官网. https://opengauss.org/zh/
 _说明：openGauss 首页包含高可靠性、故障切换等核心技术特性介绍_
 
-<a id="ref4"></a>
-**[4]** Docker Inc. "Networking overview". Docker Documentation. https://docs.docker.com/network/
+[4] Docker Inc. "Networking overview". Docker Documentation. https://docs.docker.com/network/
 
-<a id="ref5"></a>
-**[5]** PostgreSQL Global Development Group. "Hot Standby". PostgreSQL 16 Documentation. https://www.postgresql.org/docs/current/hot-standby.html
+[5] PostgreSQL Global Development Group. "Hot Standby". PostgreSQL 16 Documentation. https://www.postgresql.org/docs/current/hot-standby.html
 
-<a id="ref6"></a>
-**[6]** PostgreSQL Global Development Group. "Synchronous Replication". PostgreSQL 16 Documentation. https://www.postgresql.org/docs/current/warm-standby.html#SYNCHRONOUS-REPLICATION
+[6] PostgreSQL Global Development Group. "Synchronous Replication". PostgreSQL 16 Documentation. https://www.postgresql.org/docs/current/warm-standby.html#SYNCHRONOUS-REPLICATION
 
-<a id="ref7"></a>
-**[7]** PostgreSQL Global Development Group. "synchronous_standby_names". PostgreSQL 16 Documentation. https://www.postgresql.org/docs/current/runtime-config-replication.html#GUC-SYNCHRONOUS-STANDBY-NAMES
+[7] PostgreSQL Global Development Group. "synchronous_standby_names". PostgreSQL 16 Documentation. https://www.postgresql.org/docs/current/runtime-config-replication.html#GUC-SYNCHRONOUS-STANDBY-NAMES
 
-<a id="ref8"></a>
-**[8]** Kleppmann, M. (2017). _Designing Data-Intensive Applications: The Big Ideas Behind Reliable, Scalable, and Maintainable Systems_. O'Reilly Media. ISBN: 978-1491903063.  
-在线访问: https://ddia.vonng.com/ch6/  
+[8] Kleppmann, M. (2017). _Designing Data-Intensive Applications: The Big Ideas Behind Reliable, Scalable, and Maintainable Systems_. O'Reilly Media. ISBN: 978-1491903063.
+在线访问: https://ddia.vonng.com/ch6/
 _说明：第6章"Replication"详细讨论了数据库复制机制的设计权衡_
 
-<a id="ref9"></a>
-**[9]** EnMotech. "openGauss Docker 镜像". Docker Hub. https://hub.docker.com/r/enmotech/opengauss  
+[9] EnMotech. "openGauss Docker 镜像". Docker Hub. https://hub.docker.com/r/enmotech/opengauss
 _说明：openGauss 容器镜像的官方仓库，包含部署和配置说明_
 
-<a id="ref10"></a>
-**[10]** PostgreSQL Global Development Group. "Replication Configuration". PostgreSQL 16 Documentation. https://www.postgresql.org/docs/current/runtime-config-replication.html
+[10] PostgreSQL Global Development Group. "Replication Configuration". PostgreSQL 16 Documentation. https://www.postgresql.org/docs/current/runtime-config-replication.html
 
-<a id="ref11"></a>
-**[11]** PostgreSQL Global Development Group. "Client Authentication". PostgreSQL 16 Documentation. https://www.postgresql.org/docs/current/client-authentication.html
+[11] PostgreSQL Global Development Group. "Client Authentication". PostgreSQL 16 Documentation. https://www.postgresql.org/docs/current/client-authentication.html
 
-<a id="ref12"></a>
-**[12]** PostgreSQL Global Development Group. "Recovery Configuration". PostgreSQL 16 Documentation. https://www.postgresql.org/docs/current/recovery-config.html
+[12] PostgreSQL Global Development Group. "Recovery Configuration". PostgreSQL 16 Documentation. https://www.postgresql.org/docs/current/recovery-config.html
 
-<a id="ref13"></a>
-**[13]** PostgreSQL Global Development Group. "Monitoring Statistics". PostgreSQL 16 Documentation. https://www.postgresql.org/docs/current/monitoring-stats.html
+[13] PostgreSQL Global Development Group. "Monitoring Statistics". PostgreSQL 16 Documentation. https://www.postgresql.org/docs/current/monitoring-stats.html
 
-<a id="ref14"></a>
-**[14]** PostgreSQL Global Development Group. "High Availability, Load Balancing, and Replication". PostgreSQL 16 Documentation. https://www.postgresql.org/docs/current/high-availability.html  
+[14] PostgreSQL Global Development Group. "High Availability, Load Balancing, and Replication". PostgreSQL 16 Documentation. https://www.postgresql.org/docs/current/high-availability.html
 _说明：包含心跳检测和故障切换机制的详细说明_
 
-<a id="ref15"></a>
-**[15]** PostgreSQL Global Development Group. "Connections and Authentication". PostgreSQL 16 Documentation. https://www.postgresql.org/docs/current/runtime-config-connection.html  
+[15] PostgreSQL Global Development Group. "Connections and Authentication". PostgreSQL 16 Documentation. https://www.postgresql.org/docs/current/runtime-config-connection.html
 _说明：TCP keepalive 和连接超时参数配置_
-

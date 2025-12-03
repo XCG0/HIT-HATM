@@ -1,6 +1,7 @@
 # ===== 忽略特定文件夹（数据库数据和源代码，体积过大）=====
 openGauss/*
 omm/*
+init-container.sh
 
 # ===== 跟踪特定文件夹 =====
 .vscode/settings.json

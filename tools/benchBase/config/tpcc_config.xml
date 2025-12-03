@@ -1,0 +1,87 @@
+<?xml version="1.0"?>
+<parameters>
+    <!-- 
+    TPC-C 基准测试配置文件
+    用于测试 openGauss 流复制集群的 OLTP 性能
+    -->
+    
+    <!-- ==================== 数据库连接配置 ==================== -->
+    <type>POSTGRES</type>
+    <driver>org.postgresql.Driver</driver>
+    
+    <!-- 连接到 openGauss Primary 主节点 -->
+    <!-- 数据库: benchbase_db, 用户: benchbase, 密码: benchbase@123 (MD5加密) -->
+    <url>jdbc:postgresql://172.18.0.10:5432/benchbase_db?amp;reWriteBatchedInserts=true&amp;assumeMinServerVersion=9.0&amp;gssEncMode=disable</url>
+    <username>benchbase</username>
+    <password>benchbase@123</password>
+    <reconnectOnConnectionFailure>true</reconnectOnConnectionFailure>
+    
+    <!-- ==================== 连接池配置 ==================== -->
+    <!-- 最大连接数 = terminals -->
+    <isolation>TRANSACTION_READ_COMMITTED</isolation>
+    <batchsize>128</batchsize>
+    
+    <!-- ==================== TPC-C 业务参数 ==================== -->
+    <!-- 仓库数量，决定数据集大小（每个仓库约 100MB） -->
+    <scalefactor>10</scalefactor>
+    
+    <!-- 并发终端数（模拟并发用户） -->
+    <terminals>16</terminals>
+    
+    <!-- ==================== 测试运行参数 ==================== -->
+    <works>
+        <work>
+            <time>60</time>          <!-- 测试运行时长（秒） -->
+            <rate>10000</rate>       <!-- 目标吞吐量（tpmC） -->
+            <warmup>10</warmup>      <!-- 预热时间（秒） -->
+            
+            <!-- TPC-C 事务混合比例（必须总和为100） -->
+            <weights>45,43,4,4,4</weights>
+            <!-- 
+            对应事务类型：
+            1. NewOrder (45%): 新订单事务，包含插入操作
+            2. Payment (43%): 支付事务，包含更新操作
+            3. OrderStatus (4%): 订单状态查询，只读事务
+            4. Delivery (4%): 配送事务，批量更新
+            5. StockLevel (4%): 库存水平查询，只读事务
+            -->
+        </work>
+    </works>
+    
+    <!-- ==================== TPC-C 特定参数 ==================== -->
+    <!-- 事务类型定义 -->
+    <transactiontypes>
+        <transactiontype>
+            <name>NewOrder</name>
+        </transactiontype>
+        <transactiontype>
+            <name>Payment</name>
+        </transactiontype>
+        <transactiontype>
+            <name>OrderStatus</name>
+        </transactiontype>
+        <transactiontype>
+            <name>Delivery</name>
+        </transactiontype>
+        <transactiontype>
+            <name>StockLevel</name>
+        </transactiontype>
+    </transactiontypes>
+    
+    <!-- ==================== 结果收集配置 ==================== -->
+    <!-- 采样间隔（毫秒） -->
+    <measurementinterval>5000</measurementinterval>
+    
+    <!-- 输出格式 -->
+    <outputformat>json</outputformat>
+    
+    <!-- 延迟直方图配置 -->
+    <histograms>true</histograms>
+    
+    <!-- ==================== 高级选项 ==================== -->
+    <!-- 数据加载时的工作线程数 -->
+    <loaderThreads>4</loaderThreads>
+    
+    <!-- 是否启用查询追踪 -->
+    <tracefile></tracefile>
+</parameters>

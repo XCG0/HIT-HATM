@@ -1,0 +1,47 @@
+<?xml version="1.0"?>
+<parameters>
+
+    <!-- 连接信息 -->
+    <type>POSTGRES</type>
+    <driver>org.postgresql.Driver</driver>
+    <!-- 连接到 openGauss Primary 主节点 -->
+    <!-- 数据库: benchbase_db, 用户: benchbase, 密码: benchbase@123 (MD5加密) -->
+    <url>jdbc:postgresql://172.18.0.10:5432/benchbase_db?amp;reWriteBatchedInserts=true&amp;assumeMinServerVersion=9.0&amp;gssEncMode=disable</url>
+    <username>benchbase</username>
+    <password>benchbase@123</password>
+    <reconnectOnConnectionFailure>true</reconnectOnConnectionFailure>
+    <isolation>TRANSACTION_SERIALIZABLE</isolation>
+    <batchsize>128</batchsize>
+
+    <!-- 扩展因子为维基页面数 *1000 -->
+    <scalefactor>1</scalefactor>
+
+    <!-- 工作负载 -->
+    <terminals>1</terminals>
+    <works>
+        <work>
+            <time>60</time>
+            <rate>1000</rate>
+            <weights>1,1,7,90,1</weights>
+        </work>
+    </works>
+
+    <!-- Wikipedia 事务声明 -->
+    <transactiontypes>
+        <transactiontype>
+            <name>AddWatchList</name>
+        </transactiontype>
+        <transactiontype>
+            <name>RemoveWatchList</name>
+        </transactiontype>
+        <transactiontype>
+            <name>UpdatePage</name>
+        </transactiontype>
+        <transactiontype>
+            <name>GetPageAnonymous</name>
+        </transactiontype>
+        <transactiontype>
+            <name>GetPageAuthenticated</name>
+        </transactiontype>
+    </transactiontypes>
+</parameters>

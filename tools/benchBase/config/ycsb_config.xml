@@ -1,0 +1,56 @@
+<?xml version="1.0"?>
+<parameters>
+
+    <!-- 连接信息 -->
+    <type>POSTGRES</type>
+    <driver>org.postgresql.Driver</driver>
+    <!-- 连接到 openGauss Primary 主节点 -->
+    <!-- 数据库: benchbase_db, 用户: benchbase, 密码: benchbase@123 (MD5加密) -->
+    <url>jdbc:postgresql://172.18.0.10:5432/benchbase_db?amp;reWriteBatchedInserts=true&amp;assumeMinServerVersion=9.0&amp;gssEncMode=disable</url>
+    <username>benchbase</username>
+    <password>benchbase@123</password>
+    <reconnectOnConnectionFailure>true</reconnectOnConnectionFailure>
+    <isolation>TRANSACTION_SERIALIZABLE</isolation>
+    <batchsize>128</batchsize>
+
+    <!-- YCSB 的扩展因子为 USERTABLE 行数的千倍 -->
+    <scalefactor>1</scalefactor>
+    
+    <!-- 可选：覆盖 USERTABLE 每列的字段大小 -->
+    <!-- <fieldSize>8</fieldSize> -->
+
+    <!-- 可选：覆盖 zipfian 常数以调整倾斜度 -->
+    <!-- <skewFactor>0.99</skewFactor> -->
+
+    <!-- 工作负载 -->
+    <terminals>1</terminals>
+    <works>
+        <work>
+            <time>60</time>
+            <rate>10000</rate>
+            <weights>50,5,15,10,10,10</weights>
+        </work>
+    </works>
+
+    <!-- YCSB 事务声明 -->
+    <transactiontypes>
+        <transactiontype>
+            <name>ReadRecord</name>
+        </transactiontype>
+        <transactiontype>
+            <name>InsertRecord</name>
+        </transactiontype>
+        <transactiontype>
+            <name>ScanRecord</name>
+        </transactiontype>
+        <transactiontype>
+            <name>UpdateRecord</name>
+        </transactiontype>
+        <transactiontype>
+            <name>DeleteRecord</name>
+        </transactiontype>
+        <transactiontype>
+            <name>ReadModifyWriteRecord</name>
+        </transactiontype>
+    </transactiontypes>
+</parameters>

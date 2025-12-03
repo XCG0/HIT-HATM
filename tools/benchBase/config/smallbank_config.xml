@@ -1,0 +1,49 @@
+<?xml version="1.0"?>
+<parameters>
+
+    <!-- 连接信息 -->
+    <type>POSTGRES</type>
+    <driver>org.postgresql.Driver</driver>
+    <!-- 连接到 openGauss Primary 主节点 -->
+    <!-- 数据库: benchbase_db, 用户: benchbase, 密码: benchbase@123 (MD5加密) -->
+    <url>jdbc:postgresql://172.18.0.10:5432/benchbase_db?amp;reWriteBatchedInserts=true&amp;assumeMinServerVersion=9.0&amp;gssEncMode=disable</url>
+    <username>benchbase</username>
+    <password>benchbase@123</password>
+    <reconnectOnConnectionFailure>true</reconnectOnConnectionFailure>
+    <isolation>TRANSACTION_SERIALIZABLE</isolation>
+    <batchsize>128</batchsize>
+
+    <scalefactor>1</scalefactor>
+
+    <!-- 工作负载 -->
+    <terminals>1</terminals>
+    <works>
+        <work>
+            <time>60</time>
+            <rate>100</rate>
+            <weights>15,15,15,25,15,15</weights>
+        </work>
+    </works>
+
+    <!-- SmallBank 事务声明 -->
+    <transactiontypes>
+        <transactiontype>
+            <name>Amalgamate</name>
+        </transactiontype>
+        <transactiontype>
+            <name>Balance</name>
+        </transactiontype>
+        <transactiontype>
+            <name>DepositChecking</name>
+        </transactiontype>
+        <transactiontype>
+            <name>SendPayment</name>
+        </transactiontype>
+        <transactiontype>
+            <name>TransactSavings</name>
+        </transactiontype>
+        <transactiontype>
+            <name>WriteCheck</name>
+        </transactiontype>
+    </transactiontypes>
+</parameters>

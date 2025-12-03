@@ -89,7 +89,7 @@ docker exec opengauss-primary su - omm -c "
 listen_addresses = '*'
 port = 5432
 max_connections = 200
-password_encryption_type = 2
+password_encryption_type = 1
 wal_level = hot_standby
 max_wal_senders = 10
 wal_keep_segments = 256
@@ -112,12 +112,12 @@ fi
 
 docker exec opengauss-primary su - omm -c "echo \"$SYNC_STANDBY_CONFIG\" >> /home/omm/data/postgresql.conf" 2>/dev/null
 
-# 配置 pg_hba.conf
+# 配置 pg_hba.conf (使用 md5 认证以兼容 PostgreSQL JDBC 驱动)
 docker exec opengauss-primary su - omm -c "
     cat >> /home/omm/data/pg_hba.conf << 'EOF'
 local   all             all                                     trust
 host    all             all             127.0.0.1/32            trust
-host    all             all             172.18.0.0/16           sha256
+host    all             all             172.18.0.0/16           md5
 EOF
 " > /dev/null 2>&1
 

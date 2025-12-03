@@ -1,0 +1,163 @@
+<?xml version="1.0"?>
+<parameters>
+
+    <!-- 连接信息 -->
+    <type>POSTGRES</type>
+    <driver>org.postgresql.Driver</driver>
+    <!-- 连接到 openGauss Primary 主节点 -->
+    <!-- 数据库: benchbase_db, 用户: benchbase, 密码: benchbase@123 (MD5加密) -->
+    <url>jdbc:postgresql://172.18.0.10:5432/benchbase_db?amp;reWriteBatchedInserts=true&amp;assumeMinServerVersion=9.0&amp;gssEncMode=disable</url>
+    <username>benchbase</username>
+    <password>benchbase@123</password>
+    <reconnectOnConnectionFailure>true</reconnectOnConnectionFailure>
+    <isolation>TRANSACTION_SERIALIZABLE</isolation>
+    <batchsize>128</batchsize>
+
+    <!-- 扩展因子是 TPCC 仓库数量 -->
+    <scalefactor>1</scalefactor>
+
+    <!-- 工作负载 -->
+    <!-- 每个工作负载的终端数量 -->
+    <terminals>1</terminals>
+
+    <!-- 额外功能（已注释） -->
+    <!-- 可针对特定工作负载设置 -->
+    <!-- <terminals bench="tpcc">2</terminals> -->
+
+    <!-- 针对特定工作负载的选项，使用 @bench=[workload_name] 标记 -->
+    <!-- 针对特定工作负载的终端数量 -->
+    <!-- <terminals bench="chbenchmark">2</terminals> -->
+
+    <works>
+
+        <!-- 混合工作负载的基本 WorkPhase 配置 -->
+        <work>
+            <time>60</time>
+
+            <!-- 注意：rate 可设置为 UNLIMITED 或 DISABLED -->
+            <rate>200</rate>
+
+            <!-- 需要为每个工作负载指定事务权重，否则字段数量不匹配 -->
+            <weights bench="tpcc">45,43,4,4,4</weights>
+            <weights bench="chbenchmark">3, 2, 3, 2, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5</weights>
+        </work>
+
+    <!-- 额外功能示例 -->
+        <!-- <work> -->
+            <!-- <time>60</time> -->
+
+            <!-- <rate>200</rate> -->
+            <!-- <rate bench="chbenchmark">disabled</rate> -->
+
+            <!-- 注意：如果并非所有 worker 都激活，TPCC worker 不会均匀分布到各仓库 -->
+            <!-- <active_terminals>1</active_terminals> -->
+            <!-- <active_terminals bench="chbenchmark">1</active_terminals> -->
+
+            <!-- 指定每个工作负载的事务权重。 -->
+            <!-- <weights bench="tpcc">45,43,4,4,4</weights> -->
+            <!-- <weights bench="chbenchmark">3, 2, 3, 2, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5</weights> -->
+        <!-- </work> -->
+
+        <!--
+        <work>
+            <time>60</time>
+
+            <rate>100</rate>
+            <rate bench="chbenchmark">unlimited</rate>
+
+            <weights bench="tpcc">45,43,4,4,4</weights>
+            <weights bench="chbenchmark">3, 2, 3, 2, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5</weights>
+        </work>
+        -->
+    </works>
+
+
+    <!-- CH 专用配置 -->
+    <transactiontypes bench="chbenchmark">
+        <transactiontype>
+            <name>Q1</name>
+        </transactiontype>
+        <transactiontype>
+            <name>Q2</name>
+        </transactiontype>
+        <transactiontype>
+            <name>Q3</name>
+        </transactiontype>
+        <transactiontype>
+            <name>Q4</name>
+        </transactiontype>
+        <transactiontype>
+            <name>Q5</name>
+        </transactiontype>
+        <transactiontype>
+            <name>Q6</name>
+        </transactiontype>
+        <transactiontype>
+            <name>Q7</name>
+        </transactiontype>
+        <transactiontype>
+            <name>Q8</name>
+        </transactiontype>
+        <transactiontype>
+            <name>Q9</name>
+        </transactiontype>
+        <transactiontype>
+            <name>Q10</name>
+        </transactiontype>
+        <transactiontype>
+            <name>Q11</name>
+        </transactiontype>
+        <transactiontype>
+            <name>Q12</name>
+        </transactiontype>
+        <transactiontype>
+            <name>Q13</name>
+        </transactiontype>
+        <transactiontype>
+            <name>Q14</name>
+        </transactiontype>
+        <transactiontype>
+            <name>Q15</name>
+        </transactiontype>
+        <transactiontype>
+            <name>Q16</name>
+        </transactiontype>
+        <transactiontype>
+            <name>Q17</name>
+        </transactiontype>
+        <transactiontype>
+            <name>Q18</name>
+        </transactiontype>
+        <transactiontype>
+            <name>Q19</name>
+        </transactiontype>
+        <transactiontype>
+            <name>Q20</name>
+        </transactiontype>
+        <transactiontype>
+            <name>Q21</name>
+        </transactiontype>
+        <transactiontype>
+            <name>Q22</name>
+        </transactiontype>
+    </transactiontypes>
+
+    <!-- TPCC 专用配置 -->
+    <transactiontypes bench="tpcc">
+        <transactiontype>
+            <name>NewOrder</name>
+        </transactiontype>
+        <transactiontype>
+            <name>Payment</name>
+        </transactiontype>
+        <transactiontype>
+            <name>OrderStatus</name>
+        </transactiontype>
+        <transactiontype>
+            <name>Delivery</name>
+        </transactiontype>
+        <transactiontype>
+            <name>StockLevel</name>
+        </transactiontype>
+    </transactiontypes>
+</parameters>

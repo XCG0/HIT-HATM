@@ -58,10 +58,26 @@ done
 echo "  ✓ 清理完成"
 
 echo "[3/5] 创建网络"
-# 删除旧网络
-docker network rm opengauss-network > /dev/null 2>&1 || true
+# 删除旧网络(如果存在)
+if docker network inspect opengauss-network > /dev/null 2>&1; then
+    echo "  - 删除已存在的网络..."
+    docker network rm opengauss-network > /dev/null 2>&1 || {
+        echo "  ⚠ 网络删除失败,可能有容器仍在使用"
+        echo "  - 检查并清理相关容器..."
+        docker ps -a --filter network=opengauss-network --format "{{.Names}}" | while read container; do
+            echo "    停止容器: $container"
+            docker stop "$container" > /dev/null 2>&1 || true
+            docker rm "$container" > /dev/null 2>&1 || true
+        done
+        echo "  - 重新尝试删除网络..."
+        docker network rm opengauss-network > /dev/null 2>&1 || true
+    }
+fi
+
 # 创建新网络
-docker network create --driver bridge --subnet=172.18.0.0/16 --gateway=172.18.0.1 opengauss-network > /dev/null
+if ! docker network inspect opengauss-network > /dev/null 2>&1; then
+    docker network create --driver bridge --subnet=172.18.0.0/16 --gateway=172.18.0.1 opengauss-network > /dev/null
+fi
 echo "  ✓ 网络创建完成"
 
 TOTAL_NODES=$((1 + STANDBY_COUNT))

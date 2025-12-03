@@ -1,14 +1,15 @@
 #!/bin/bash
 # openGauss 多节点集群 - 一键自动部署脚本
-# 用法: ./multi-node.sh [-n 节点数] [-m 复制模式] [-y 所有步骤自动确认]
+# 用法: ./multi-node.sh [-n 节点数] [-m 复制模式] [-s 仅执行某一步骤] [-y 所有步骤自动确认]
 
 set -e
 
-# ==================== 配置参数 ====================
+# ========================== 配置参数 ====================
 DEFAULT_STANDBY_COUNT=2
 DEFAULT_REPLICATION_MODE="ANY1"
 AUTO_CONFIRM=false
-SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+ONLY_STEP=""
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/../tools" && pwd)"
 
 # 颜色定义
 RED='\033[0;31m'
@@ -27,8 +28,18 @@ openGauss 多节点集群一键部署脚本
 选项:
     -n NUMBER   备节点数量 (1-10)，默认: ${DEFAULT_STANDBY_COUNT}
     -m MODE     复制模式，默认: ${DEFAULT_REPLICATION_MODE}
+    -s STEP     仅执行指定步骤 (1-5 或 start/stop/restart)，默认执行全部步骤
     -y          所有步骤自动确认，不提示
     -h          显示帮助
+
+可执行的步骤:
+    1 或 create    - 创建容器和网络
+    2 或 ssh       - 配置 SSH 免密登录
+    3 或 init      - 初始化集群
+    4 或 start     - 启动集群
+    5 或 verify    - 验证集群
+    stop           - 停止集群
+    restart        - 重启集群
 
 示例:
     $0 -m SYNC           # 1主2备，SYNC模式，每步确认
@@ -36,8 +47,57 @@ openGauss 多节点集群一键部署脚本
     $0 -n 2 -m ANY1      # 1主2备，ANY1模式，每步确认（默认）
     $0 -n 4 -m ANY2 -y   # 1主4备，ANY2模式，自动执行
     $0 -n 3 -m FIRST2    # 1主3备，FIRST2模式，每步确认
+    $0 -s 4              # 仅启动集群（第4步）
+    $0 -s start          # 仅启动集群（同上）
+    $0 -s stop           # 仅停止集群
+    $0 -s restart -y     # 重启集群（自动确认）
 
 EOF
+}
+
+# ==================== 单步骤执行函数 ====================
+execute_single_step() {
+    local step=$1
+    local standby_count=$2
+    local replication_mode=$3
+    
+    # 标准化步骤名称
+    case "${step,,}" in
+        1|create) step_num=1; script="01_create_containers.sh"; desc="创建 Docker 容器和网络配置"; args="-n $standby_count" ;;
+        2|ssh) step_num=2; script="02_setup_ssh.sh"; desc="配置节点间 SSH 免密登录"; args="" ;;
+        3|init) step_num=3; script="03_init_cluster.sh"; desc="初始化数据库集群和主备复制"; args="-m $replication_mode" ;;
+        4|start) step_num=4; script="04_start_cluster.sh"; desc="启动所有数据库节点"; args="" ;;
+        5|verify) step_num=5; script="05_verify_cluster.sh"; desc="验证集群状态和复制功能"; args="" ;;
+        stop) step_num=6; script="06_stop_cluster.sh"; desc="停止所有数据库节点"; args="" ;;
+        restart) 
+            echo -e "${BLUE}执行集群重启 (停止 -> 启动)${NC}"
+            execute_single_step "stop" "$standby_count" "$replication_mode"
+            sleep 2
+            execute_single_step "start" "$standby_count" "$replication_mode"
+            return $?
+            ;;
+        *)
+            echo -e "${RED}错误: 无效的步骤 '$step'${NC}"
+            echo "有效步骤: 1-5, create, ssh, init, start, verify, stop, restart"
+            return 1
+            ;;
+    esac
+    
+    # 显示单步骤执行信息
+    echo ""
+    echo -e "${BLUE}╔════════════════════════════════════════════════╗${NC}"
+    echo -e "${BLUE}         单步骤执行模式${NC}"
+    echo -e "${BLUE}╚════════════════════════════════════════════════╝${NC}"
+    echo ""
+    echo -e "  📌 步骤 ${step_num}: ${script}"
+    echo -e "  📝 描述: ${desc}"
+    [ -n "$args" ] && echo -e "  ⚙️  参数: ${args}"
+    echo ""
+    
+    # 执行步骤
+    AUTO_CONFIRM=true  # 单步骤模式自动确认
+    execute_script "$step_num" "$script" "$desc" $args
+    return $?
 }
 
 # ==================== 用户确认函数 ====================
@@ -122,23 +182,30 @@ main() {
     local STANDBY_COUNT=$DEFAULT_STANDBY_COUNT
     local REPLICATION_MODE=$DEFAULT_REPLICATION_MODE
     
-    while getopts "n:m:yh" opt; do
+    while getopts "n:m:s:yh" opt; do
         case $opt in
             n) STANDBY_COUNT=$OPTARG ;;
             m) REPLICATION_MODE=$(echo "$OPTARG" | tr '[:lower:]' '[:upper:]') ;;
+            s) ONLY_STEP=$OPTARG ;;
             y) AUTO_CONFIRM=true ;;
             h) show_help; exit 0 ;;
             \?) echo "错误: 无效选项 -$OPTARG"; show_help; exit 1 ;;
         esac
     done
     
+    # 处理单步骤执行模式
+    if [ -n "$ONLY_STEP" ]; then
+        execute_single_step "$ONLY_STEP" "$STANDBY_COUNT" "$REPLICATION_MODE"
+        exit $?
+    fi
+    
     # 显示配置
     clear
     echo ""
     echo -e "${BLUE}╔════════════════════════════════════════════════╗${NC}"
-    echo -e "${BLUE}║                                                ║${NC}"
-    echo -e "${BLUE}║      openGauss 多节点集群自动部署工具          ║${NC}"
-    echo -e "${BLUE}║                                                ║${NC}"
+    echo -e "${BLUE}${NC}"
+    echo -e "${BLUE}      openGauss 多节点集群自动部署工具${NC}"
+    echo -e "${BLUE}${NC}"
     echo -e "${BLUE}╚════════════════════════════════════════════════╝${NC}"
     echo ""
     echo -e "  📦 集群规模: ${GREEN}1主 + ${STANDBY_COUNT}备${NC}"
