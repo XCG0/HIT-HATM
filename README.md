@@ -18,9 +18,10 @@
    docker pull xcg0/benchbase-opengauss:latest
    ```
 
-   > - 单节点部署请参考：[单节点快速部署指南](./docs/single-node.md)
-   > - openGauss 数据库内核调试请参考：[openGauss 数据库内核调试指南
-   >   ](./docs/debug.md)
+   > 单节点部署请参考：[单节点快速部署指南](./docs/single-node.md)
+   >
+   > openGauss 数据库内核调试请参考：[openGauss 数据库内核调试指南
+   > ](./docs/debug.md)
    >
 
 ---
@@ -63,12 +64,14 @@ graph TB
 ```bash
 cd scripts
 
-./multi-node.sh     # 1主2备，ANY1模式，全部执行，每步确认（默认）
-./multi-node.sh -y  # 1主2备，ANY1模式，全部执行，自动确认
-./multi-node.sh -n 2 -m ANY1 -y # 同上
-
 ./multi-node.sh -h  # 显示帮助信息
+
+#./multi-node.sh     # 1主2备，ANY1模式，全部执行，每步确认（默认）
+./multi-node.sh -y  # 1主2备，ANY1模式，全部执行，自动确认
+#./multi-node.sh -n 2 -m ANY1 -y # 同上
+
 ```
+
 
 | 参数          | 说明              | 默认值   | 示例                      |
 | ------------- | ----------------- | -------- | ------------------------- |
@@ -85,7 +88,7 @@ cd scripts
 > - `SYNC`：任意 N 个备库为同步，其他为异
 > - `ASYNC`：所有备库均为异步
 >
-> `-s` 可选步骤有
+> `-s` 可选步骤有 `1 或 create`、`2 或 ssh`、``3 或 init``、`4 或 start`、`5 或 verify`、`stop `、`restart`
 
 执行流程图：
 
@@ -221,16 +224,19 @@ flowchart LR
 所有配置文件位于 `tools/benchBase/config/` 目录，`tools/benchBase/config/postgres/` 下有针对 PostgreSQL 的官方示例配置：
 
 ```bash
-# 从模板创建其他基准测试配置
-cp config/postgres/sample_smallbank_config.xml config/smallbank_config.xml
+# 从模板创建其他基准测试配置（以 tpcc 为例，注意已经配置过了）
+cp config/postgres/sample_tpcc_config.xml config/tpcc_config.xml
 ```
 
-**主要配置项**：
-
-- `<scalefactor>` - 数据规模（TPC-C 为仓库数量）
-- `<terminals>` - 并发终端数
-- `<time>` - 测试时长（秒）
-- `<warmup>` - 预热时间（秒）
+> 注意从模板创建配置文件后修改下面几行：
+>
+> ```xml
+>
+> <!-- 数据库: benchbase_db, 用户: benchbase, 密码: benchbase@123 (MD5加密) -->
+> <url>jdbc:postgresql://172.18.0.10:5432/benchbase_db?…………</url>
+> <username>benchbase</username>
+> <password>benchbase@123</password>
+> ```
 
 ### 3.4 测试结果
 
