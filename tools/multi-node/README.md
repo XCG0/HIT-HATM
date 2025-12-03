@@ -38,7 +38,7 @@ cd scripts
 ### 手动部署
 
 ```mermaid
-%%{init {"themeVariables":{"fontColor":"black"}}}%%
+%%{init: {"theme":"neutral"}}%%
 flowchart LR
     A["初始化环境\n（01_create_containers.sh）"] --> B["配置 SSH 互信\n（02_setup_ssh.sh）"]
     B --> C["初始化集群参数\n（03_init_cluster.sh）"]
@@ -134,7 +134,7 @@ recovery_target_timeline = 'latest'
 ### 拓扑结构
 
 ```mermaid
-%%{init {"themeVariables":{"fontColor":"black"}}}%%
+%%{init: {"theme":"neutral"}}%%
 graph TB
     subgraph Docker["Docker 网络 (172.18.0.0/16)"]
         Primary["<b>主节点</b><br/>opengauss-primary<br/>172.18.0.10:5432"]
@@ -171,7 +171,7 @@ graph TB
 ### 网络通信
 
 ```mermaid
-%%{init {"themeVariables":{"fontColor":"black"}}}%%
+%%{init: {"theme":"neutral"}}%%
 graph TB
     subgraph Primary["主节点 172.18.0.10"]
         P_DB[数据库<br/>5432]
@@ -261,7 +261,7 @@ esac
 #### ANY N 模式（推荐）
 
 ```mermaid
-%%{init {"themeVariables":{"fontColor":"black"}}}%%
+%%{init: {"theme":"neutral"}}%%
 sequenceDiagram
     participant C as 客户端
     participant P as 主节点
@@ -293,7 +293,7 @@ sequenceDiagram
 #### FIRST N 模式
 
 ```mermaid
-%%{init {"themeVariables":{"fontColor":"black"}}}%%
+%%{init: {"theme":"neutral"}}%%
 sequenceDiagram
     participant C as 客户端
     participant P as 主节点
@@ -387,7 +387,7 @@ SELECT now() - pg_last_xact_replay_timestamp() AS 延迟;
 ### 故障检测机制
 
 ```mermaid
-%%{init {"themeVariables":{"fontColor":"black"}}}%%
+%%{init: {"theme":"neutral"}}%%
 stateDiagram-v2
     [*] --> Normal: 集群启动
   
@@ -463,7 +463,7 @@ docker run --network opengauss-network --ip 172.18.0.11 ...  # 备节点1
 **脚本参考：** `02_setup_ssh.sh`
 
 ```mermaid
-%%{init {"themeVariables":{"fontColor":"black"}}}%%
+%%{init: {"theme":"neutral"}}%%
 graph LR
     A[启动SSH服务] --> B[生成密钥对]
     B --> C[收集公钥]

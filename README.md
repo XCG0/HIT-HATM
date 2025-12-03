@@ -35,7 +35,7 @@
 集群架构如下：
 
 ```mermaid
-%%{init {"themeVariables":{"fontColor":"black"}}}%%
+%%{init: {"theme":"neutral"}}%%
 graph TB
     subgraph Docker["Docker 网络 (172.18.0.0/16)"]
         Primary["<b>主节点</b><br/>opengauss-primary<br/>172.18.0.10:5432"]
@@ -94,7 +94,7 @@ cd scripts
 执行流程图：
 
 ```mermaid
-%%{init {"themeVariables":{"fontColor":"black"}}}%%
+%%{init: {"theme":"neutral"}}%%
 flowchart LR
     A["初始化环境</b><br/>（01_create_containers.sh）"] --> B["配置 SSH 互信</b><br/>（02_setup_ssh.sh）"]
     B --> C["初始化集群参数</b><br/>（03_init_cluster.sh）"]
@@ -141,7 +141,7 @@ BenchBase（原 OLTP-Bench）是 CMU 数据库组开发的**多数据库 SQL 基
 测试架构如下：
 
 ```mermaid
-%%{init {"themeVariables":{"fontColor":"black"}}}%%
+%%{init: {"theme":"neutral"}}%%
 graph LR
     subgraph Docker["Docker 环境"]
         BB[BenchBase 容器]
@@ -207,7 +207,7 @@ cd scripts
 执行流程说明：
 
 ```mermaid
-%%{init {"themeVariables":{"fontColor":"black"}}}%%
+%%{init: {"theme":"neutral"}}%%
 flowchart LR
     A["构建 BenchBase 容器\n（01_start_benchbase.sh）"] --> C["配置数据库与表结构\n（02_create_schema.sh）"]
     C --> D["加载数据\n（03_load_data.sh）"]

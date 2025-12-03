@@ -56,7 +56,7 @@ BenchBase（原 OLTP-Bench）是 CMU 数据库组开发的**多数据库 SQL 基
 ### 3.1 系统拓扑图
 
 ```mermaid
-%%{init {"themeVariables":{"fontColor":"black"}}}%%
+%%{init: {"theme":"neutral"}}%%
 graph LR
     subgraph Docker["Docker 环境"]
         BB[BenchBase 容器]
@@ -94,7 +94,7 @@ graph LR
 ### 3.2 工作流程图
 
 ```mermaid
-%%{init {"themeVariables":{"fontColor":"black"}}}%%
+%%{init: {"theme":"neutral"}}%%
 flowchart LR
     A["构建 BenchBase 容器\n（01_start_benchbase.sh）"] --> C["配置数据库与表结构\n（02_create_schema.sh）"]
     C --> D["加载数据\n（03_load_data.sh）"]
@@ -106,6 +106,7 @@ flowchart LR
     style D fill:#F8BBD0
     style E fill:#E1BEE7
     style F fill:#FFF9C4
+
 ```
 
 **流程说明:**
@@ -376,8 +377,8 @@ cat results/tpcc_result.txt
 
 ### 8.3 辅助脚本
 
-| 脚本                                        | 功能             | 使用场景             |
-| ------------------------------------------- | ---------------- | -------------------- |
+| 脚本             | 功能             | 使用场景             |
+| ---------------- | ---------------- | -------------------- |
 | `benchBase.sh` | 一键运行完整流程 | 首次测试、自动化测试 |
 
 **注意**: [`benchBase.sh`](../../scripts/benchBase.sh) 目前默认使用 `tpcc`，后续将支持 `-t` 参数。
@@ -396,7 +397,7 @@ cat results/tpcc_result.txt
 ## 附录：完整测试工作流
 
 ```mermaid
-%%{init {"themeVariables":{"fontColor":"black"}}}%%
+%%{init: {"theme":"neutral"}}%%
 flowchart TB
     Start([开始测试]) --> Check{环境检查}
     Check -->|失败| Fix[修复环境]
