@@ -87,7 +87,7 @@ echo -e "倒计时: 1 秒后开始..."
 sleep 1
 
 # 4. 执行基准测试
-echo -e "\n${YELLOW}[步骤 4/4]${NC} 执行 TPC-C 基准测试..."
+echo -e "\n${YELLOW}[步骤 4/4]${NC} 执行 ${BENCHMARK_TYPE} 基准测试..."
 echo -e "${BLUE}=======================================${NC}"
 echo -e "${GREEN}测试已开始! ($(date '+%Y-%m-%d %H:%M:%S'))${NC}"
 echo -e "${BLUE}=======================================${NC}"

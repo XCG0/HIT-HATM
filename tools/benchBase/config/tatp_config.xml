@@ -6,7 +6,7 @@
     <driver>org.postgresql.Driver</driver>
     <!-- 连接到 openGauss Primary 主节点 -->
     <!-- 数据库: benchbase_db, 用户: benchbase, 密码: benchbase@123 (MD5加密) -->
-    <url>jdbc:postgresql://172.18.0.10:5432/benchbase_db?amp;reWriteBatchedInserts=true&amp;assumeMinServerVersion=9.0&amp;gssEncMode=disable</url>
+    <url>jdbc:postgresql://172.18.0.10:5432/benchbase_db?sslmode=disable&amp;ApplicationName=tatp&amp;reWriteBatchedInserts=true&amp;assumeMinServerVersion=9.0&amp;gssEncMode=disable</url>
     <username>benchbase</username>
     <password>benchbase@123</password>
     <reconnectOnConnectionFailure>true</reconnectOnConnectionFailure>

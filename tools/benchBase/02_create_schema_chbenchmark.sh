@@ -120,7 +120,7 @@ else
 fi
 
 # 4. 创建 TPC-C Schema（这是 CHBenchmark 的基础）
-echo -e "\n${YELLOW}[步骤 4/7]${NC} 创建 TPC-C 基础表结构..."
+echo -e "\n${YELLOW}[步骤 4/7]${NC} 创建 ${BENCHMARK_TYPE} 基础表结构..."
 docker exec ${CONTAINER_NAME} bash -c "
     java -jar benchbase.jar \
         -b tpcc \

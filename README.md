@@ -182,7 +182,7 @@ cd scripts
 ./benchBase.sh -t ycsb
 ./benchBase.sh -t tpch
 ./benchBase.sh -t tatp
-./benchBase.sh -t wkikipedia
+./benchBase.sh -t wikipedia
 ./benchBase.sh -t chbenchmark
 ```
 

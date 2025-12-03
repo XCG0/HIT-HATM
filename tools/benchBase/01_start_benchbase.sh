@@ -93,12 +93,11 @@ fi
 # 启动容器（后台运行）
 # 添加时区和语言环境变量
 # TZ=Asia/Shanghai: 设置为中国标准时间 (UTC+8)
-# LC_ALL=en_GB.UTF-8: 使用英式 24 小时时间格式
 docker run -d \
     --name ${CONTAINER_NAME} \
     --network ${NETWORK_NAME} \
     -e TZ=Asia/Shanghai \
-    -e LC_ALL=en_GB.UTF-8 \
+    -e LC_ALL=C \
     -v "${CONFIG_DIR}:/benchbase/config" \
     -v "${RESULTS_DIR}:/benchbase/results" \
     --workdir /benchbase \

@@ -66,7 +66,7 @@ echo -e "  - 基准测试: ${BENCHMARK_TYPE^^}"
 echo -e "  - 规模因子: ${SCALEFACTOR}"
 
 # 3. 执行数据加载
-echo -e "\n${YELLOW}[步骤 3/3]${NC} 加载 TPC-C 测试数据..."
+echo -e "\n${YELLOW}[步骤 3/3]${NC} 加载 ${BENCHMARK_TYPE} 测试数据..."
 echo -e "${BLUE}正在批量插入数据（这可能需要较长时间，请耐心等待）...${NC}"
 echo -e "${YELLOW}提示: 可以在另一个终端中查看容器日志:${NC}"
 echo -e "  ${GREEN}docker logs -f ${CONTAINER_NAME}${NC}"
