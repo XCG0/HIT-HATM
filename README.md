@@ -18,10 +18,10 @@
    docker pull xcg0/benchbase-opengauss:latest
    ```
 
-> - 单节点部署请参考：[单节点快速部署指南](./docs/single-node.md)
-> - openGauss 数据库内核调试请参考：[openGauss 数据库内核调试指南](./docs/debug.md)
-
-5. （如果需要分析 benchbase 结果）Python 3.7 以上版本
+   > - 单节点部署请参考：[单节点快速部署指南](./docs/single-node.md)
+   > - openGauss 数据库内核调试请参考：[openGauss 数据库内核调试指南
+   >   ](./docs/debug.md)
+   >
 
 ---
 

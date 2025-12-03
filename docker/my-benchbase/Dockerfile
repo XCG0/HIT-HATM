@@ -7,13 +7,13 @@ LABEL org.opencontainers.image.source="https://github.com/cmu-db/benchbase/"
 RUN sed -i 's|http://archive.ubuntu.com/ubuntu/|http://mirrors.aliyun.com/ubuntu/|g' /etc/apt/sources.list.d/ubuntu.sources \
     && sed -i 's|http://security.ubuntu.com/ubuntu/|http://mirrors.aliyun.com/ubuntu/|g' /etc/apt/sources.list.d/ubuntu.sources
 
-# Make sure the image is patched and up to date.
-# Also add a few nice cli tools.
-# 临时取消代理,直接访问阿里云镜像(国内网络更快)
+
+# 安装 Python3 和 pip，并保留原有工具
 RUN unset http_proxy https_proxy HTTP_PROXY HTTPS_PROXY && \
     apt-get update \
     && apt-get -y upgrade \
-    && apt-get -y install --no-install-recommends sudo vim-nox neovim less bash-completion colordiff git openssh-client jq ripgrep libxml2-utils \
+    && apt-get -y install --no-install-recommends sudo vim-nox less bash-completion git openssh-client jq python3 python3-pip \
+    && ln -sf /usr/bin/python3 /usr/bin/python \
     && apt-get clean && rm -rf /var/lib/apt/lists/*
 
 # Add a containeruser that allows vscode/codespaces to map the local host user

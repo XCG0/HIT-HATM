@@ -51,43 +51,19 @@ else
 fi
 echo -e "${BLUE}========================================${NC}"
 
-# 1. 检查 Python 分析脚本
-if [ ! -f "$PYTHON_SCRIPT" ]; then
-    echo -e "${RED}错误: 找不到 Python 分析脚本: $PYTHON_SCRIPT${NC}"
-    exit 1
-fi
-
-# 2. 检查 Python 是否可用
+# 1. 检查容器是否运行
 USE_PYTHON_ANALYSIS=true
-PYTHON_CMD=""
-
-if ! command -v python >/dev/null 2>&1 && ! command -v python3 >/dev/null 2>&1; then
-    echo -e "${YELLOW}警告: 未安装 Python，将直接打印 JSON 结果${NC}"
+if ! docker ps --format '{{.Names}}' | grep -q '^benchbase-client$'; then
+    echo -e "${YELLOW}警告: benchbase-client 容器未运行，将直接打印 JSON 结果${NC}"
     USE_PYTHON_ANALYSIS=false
 else
-    # 3. 确定 Python 命令（优先使用 python，然后 python3）
-    if command -v python >/dev/null 2>&1 && python --version >/dev/null 2>&1; then
-        PYTHON_CMD="python"
-    elif command -v python3 >/dev/null 2>&1 && python3 --version >/dev/null 2>&1; then
-        PYTHON_CMD="python3"
-    else
-        echo -e "${YELLOW}警告: Python 命令无法正常工作，将直接打印 JSON 结果${NC}"
+    # 2. 检查容器中 Python 是否可用
+    if ! docker exec benchbase-client python --version >/dev/null 2>&1; then
+        echo -e "${YELLOW}警告: 容器中未安装 Python，将直接打印 JSON 结果${NC}"
         USE_PYTHON_ANALYSIS=false
-    fi
-    
-    # 4. 检查 Python 版本（需要 3.6+，推荐 3.7+）
-    if [ "$USE_PYTHON_ANALYSIS" = true ]; then
-        # 使用更兼容的版本检测方法（不使用 f-string）
-        PYTHON_VERSION=$($PYTHON_CMD -c 'import sys; print("{}.{}".format(sys.version_info.major, sys.version_info.minor))' 2>/dev/null || echo "0.0")
-        MAJOR_VERSION=$(echo $PYTHON_VERSION | cut -d'.' -f1)
-        MINOR_VERSION=$(echo $PYTHON_VERSION | cut -d'.' -f2)
-        
-        if [ "$MAJOR_VERSION" -lt 3 ] || ([ "$MAJOR_VERSION" -eq 3 ] && [ "$MINOR_VERSION" -lt 6 ]); then
-            echo -e "${YELLOW}警告: Python 版本 $PYTHON_VERSION 过低（需要 3.6+），将直接打印 JSON 结果${NC}"
-            USE_PYTHON_ANALYSIS=false
-        else
-            echo -e "${GREEN}✓ 检测到 Python $PYTHON_VERSION (使用 $PYTHON_CMD)${NC}"
-        fi
+    else
+        PYTHON_VERSION=$(docker exec benchbase-client python --version 2>&1 | grep -oP '\d+\.\d+' | head -1)
+        echo -e "${GREEN}✓ 容器中检测到 Python $PYTHON_VERSION${NC}"
     fi
 fi
 
@@ -154,22 +130,22 @@ fi
 
 # 7. 执行分析或直接打印 JSON
 if [ "$USE_PYTHON_ANALYSIS" = true ]; then
-    # 使用 Python 分析脚本
-    echo -e "\n${YELLOW}[分析中]${NC} 使用 $PYTHON_CMD 解析测试结果...\n"
+    # 在 benchbase-client 容器中运行 Python 分析脚本
+    echo -e "\n${YELLOW}[分析中]${NC} 在 benchbase-client 容器中使用 Python 解析测试结果...\n"
     
-    # 切换到脚本目录以避免路径问题
-    cd "$SCRIPT_DIR"
+    # 容器内的路径（results 文件夹挂载到 /benchbase/results）
+    CONTAINER_RESULTS_DIR="/benchbase/results"
     
-    # 计算相对路径（从 SCRIPT_DIR 到 JSON_FILE）
-    RELATIVE_JSON_PATH=$(realpath --relative-to="$SCRIPT_DIR" "$JSON_FILE" 2>/dev/null || echo "$JSON_FILE")
+    # 计算 JSON 文件在容器内的相对路径
+    # JSON_FILE 格式: /c/Users/.../tools/benchBase/results/xxx/yyy.summary.json
+    # 需要转换为: /benchbase/results/xxx/yyy.summary.json
+    RELATIVE_PATH="${JSON_FILE#${RESULTS_DIR}/}"
+    CONTAINER_JSON_FILE="${CONTAINER_RESULTS_DIR}/${RELATIVE_PATH}"
     
-    # 如果 realpath 失败，尝试手动构建相对路径
-    if [ "$RELATIVE_JSON_PATH" = "$JSON_FILE" ] && [[ "$JSON_FILE" == "${RESULTS_DIR}"* ]]; then
-        RELATIVE_JSON_PATH="results/${JSON_FILE#${RESULTS_DIR}/}"
-    fi
+    echo -e "${BLUE}容器路径: ${CONTAINER_JSON_FILE}${NC}"
     
-    # 传递相对路径给 Python
-    $PYTHON_CMD "$(basename "$PYTHON_SCRIPT")" "$RELATIVE_JSON_PATH"
+    # 在容器中运行 Python 脚本（analyze_results.py 在 results 目录下）
+    docker exec -w /benchbase/results benchbase-client python analyze_results.py "$CONTAINER_JSON_FILE"
     
     # 检查执行结果
     if [ $? -eq 0 ]; then
