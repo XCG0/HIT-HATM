@@ -34,29 +34,7 @@
 
 集群架构如下：
 
-```mermaid
-%%{init: {"theme":"neutral"}}%%
-graph TB
-    subgraph Docker["Docker 网络 (172.18.0.0/16)"]
-        Primary["<b>主节点</b><br/>opengauss-primary<br/>172.18.0.10:5432"]
-  
-        Standby1["<b>备节点1</b><br/>opengauss-standby1<br/>172.18.0.11:5432"]
-        Standby2["<b>备节点2</b><br/>opengauss-standby2<br/>172.18.0.12:5432"]
-        StandbyN["<b>备节点N</b><br/>opengauss-standbyN<br/>172.18.0.10+N:5432"]
-  
-        Primary -->|"WAL复制+心跳"| Standby1
-        Primary -->|"WAL复制+心跳"| Standby2
-        Primary -.->|"最多10个备节点"| StandbyN
-    end
-  
-    Client["应用客户端"] -->|"读写"| Primary
-    Client -.->|"只读"| Standby1
-  
-    style Primary fill:#e3f2fd,stroke:#1976d2,stroke-width:3px
-    style Standby1 fill:#fff3e0,stroke:#f57c00,stroke-width:2px
-    style Standby2 fill:#fff3e0,stroke:#f57c00,stroke-width:2px
-    style StandbyN fill:#f3e5f5,stroke:#9c27b0,stroke-width:2px,stroke-dasharray:5 5
-```
+![多节点集群架构图](./images/README-1.drawio.png)
 
 ### 2.1 快速开始
 
@@ -93,20 +71,7 @@ cd scripts
 
 执行流程图：
 
-```mermaid
-%%{init: {"theme":"neutral"}}%%
-flowchart LR
-    A["初始化环境</b><br/>（01_create_containers.sh）"] --> B["配置 SSH 互信</b><br/>（02_setup_ssh.sh）"]
-    B --> C["初始化集群参数</b><br/>（03_init_cluster.sh）"]
-    C --> D["启动数据库集群</b><br/>（04_start_cluster.sh）"]
-    D --> E["验证集群状态</b><br/>（05_verify_cluster.sh）"]
-
-    style A fill:#E3F2FD
-    style B fill:#FFF3E0
-    style C fill:#E8F5E9
-    style D fill:#F3E5F5
-    style E fill:#FFFDE7
-```
+![多节点部署流程图](./images/README-2.drawio.png)
 
 > 01 ~ 05 脚本均位于 `scripts/multi-node/` 目录下。
 >
@@ -140,40 +105,7 @@ BenchBase（原 OLTP-Bench）是 CMU 数据库组开发的**多数据库 SQL 基
 
 测试架构如下：
 
-```mermaid
-%%{init: {"theme":"neutral"}}%%
-graph LR
-    subgraph Docker["Docker 环境"]
-        BB[BenchBase 容器]
-        Primary[Primary 主节点]
-        Standby1[Standby1 备节点]
-        Standby2[Standby2 备节点]
-	StandbyN[StandbyN 备节点]
-    end
-
-    Config["config/<br/>配置文件夹"] -.调整配置<br/>挂载.-> BB
-    BB -->|JDBC 连接| Primary
-    Primary -.流复制.-> Standby1
-    Primary -.流复制.-> Standby2
-    Primary -.流复制.-> StandbyN
-    BB -.生成结果<br/>挂载.-> Results["results/<br/>结果文件夹"]
-  
-    Vol1["主机:<br/>scripts/benchBase/config/"] -.volume.-> Config
-    Vol2["主机:<br/>scripts/benchBase/results/"] -.volume.-> Results
-
-    classDef bbStyle fill:#E8F5E9,stroke:#333,stroke-width:2px
-    classDef primaryStyle fill:#FFD54F,stroke:#333,stroke-width:2px
-    classDef standbyStyle fill:#B3E5FC,stroke:#333,stroke-width:2px
-    classDef configStyle fill:#FFF9C4,stroke:#333,stroke-width:2px
-    classDef resultsStyle fill:#F8BBD0,stroke:#333,stroke-width:2px
-
-    class BB bbStyle
-    class Primary primaryStyle
-    class Standby1,Standby2,StandbyN standbyStyle
-    class Config configStyle
-    class Results resultsStyle
-
-```
+![BenchBase 架构图](./images/README-3.drawio.png)
 
 ### 3.1 支持的基准测试
 
@@ -206,20 +138,7 @@ cd scripts
 
 执行流程说明：
 
-```mermaid
-%%{init: {"theme":"neutral"}}%%
-flowchart LR
-    A["构建 BenchBase 容器\n（01_start_benchbase.sh）"] --> C["配置数据库与表结构\n（02_create_schema.sh）"]
-    C --> D["加载数据\n（03_load_data.sh）"]
-    D --> E["运行测试\n（04_run_benchmark.sh）"]
-    E --> F["分析结果\n（05_analyze_results.sh）"]
-
-    style A fill:#FFE0B2
-    style C fill:#BBDEFB
-    style D fill:#F8BBD0
-    style E fill:#E1BEE7
-    style F fill:#FFF9C4
-```
+![BenchBase 测试流程图](./images/README-4.drawio.png)
 
 > 01 ~ 05 脚本均位于 `scripts/benchBase/` 目录下。
 

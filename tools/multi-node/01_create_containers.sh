@@ -29,8 +29,8 @@ echo "[1/5] 准备环境 (1主+${STANDBY_COUNT}备)"
 
 # 获取脚本路径
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-PROJECT_ROOT="$(dirname "$SCRIPT_DIR")"
-INIT_SCRIPT="$PROJECT_ROOT/init-container.sh"
+PROJECT_ROOT="$(cd "$SCRIPT_DIR/../.." && pwd)"
+INIT_SCRIPT="$PROJECT_ROOT/scripts/init-container.sh"
 
 # 检查文件
 if [ ! -f "$INIT_SCRIPT" ]; then
