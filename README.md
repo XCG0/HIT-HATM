@@ -3,8 +3,10 @@
 ## 1. 宿主机相关准备
 
 1. [安装 docker](https://www.docker.com/get-started)，每次连接 docker 容器前**务必确保 Docker Desktop 已启动**。
-2. 安装 [git](https://git-scm.com/downloads)，用于克隆代码仓库。
+2. 安装 [git](https://git-scm.com/downloads)，用于克隆代码仓库，**后续命令请使用 bash 完成**（一般来说 git 会自动安装 bash）。
 3. 安装 [VS Code](https://code.visualstudio.com/)，并安装相关插件：
+
+   ![VS Code Docker 插件](./images/image-4.png)
 
    > 具体使用方法参考：[在 VS Code 中使用 docker](https://zhuanlan.zhihu.com/p/496213879)。
    >
@@ -50,7 +52,6 @@ cd scripts
 #./multi-node.sh -n 2 -m ANY1 -y # 同上
 
 ```
-
 
 | 参数          | 说明              | 默认值   | 示例                      |
 | ------------- | ----------------- | -------- | ------------------------- |
@@ -154,7 +155,6 @@ cp config/postgres/sample_tpcc_config.xml config/tpcc_config.xml
 > 注意从模板创建配置文件后修改下面几行：
 >
 > ```xml
->
 > <!-- 数据库: benchbase_db, 用户: benchbase, 密码: benchbase@123 (MD5加密) -->
 > <url>jdbc:postgresql://172.18.0.10:5432/benchbase_db?…………</url>
 > <username>benchbase</username>
@@ -181,3 +181,10 @@ ls -lh tools/benchBase/results/<测试名+日期>/
 - **Throughput (tpmC)** - 每分钟事务数（TPC-C 核心指标）
 - **P50/P95/P99 Latency** - 延迟百分位数
 - **Goodput** - 有效吞吐量
+
+# 常见问题
+
+## 1. Windows 换行符
+
+- **问题描述**：`'\r':command not found`
+- **解决方法**：`find.-name"*.sh"-execsed-i's/\r$//'{}\;`，将 Windows 的 CRLF (`\r\n`) 换行符转为 Linux/WSL 需要的 LF (`\n`)。
