@@ -1,0 +1,26 @@
+{
+ "Start timestamp (milliseconds)": 1769324975107,
+ "Current Timestamp (milliseconds)": 1769325051519,
+ "Elapsed Time (nanoseconds)": 60000074148,
+ "DBMS Type": "POSTGRES",
+ "DBMS Version": "(openGauss 5.0.5 build d4f4dd12) compiled at 2025-10-31 14:28:36 commit 0 last mr 8501 debug on x86_64-unknown-linux-gnu, compiled by g++ (GCC) 7.3.0, 64-bit",
+ "Benchmark Type": "tpcc",
+ "Final State": "EXIT",
+ "Measured Requests": 37013,
+ "isolation": "TRANSACTION_READ_COMMITTED",
+ "scalefactor": "10",
+ "terminals": "16",
+ "Latency Distribution": {
+  "95th Percentile Latency (microseconds)": 70844,
+  "Maximum Latency (microseconds)": 397572,
+  "Median Latency (microseconds)": 18287,
+  "Minimum Latency (microseconds)": 706,
+  "25th Percentile Latency (microseconds)": 10259,
+  "90th Percentile Latency (microseconds)": 54370,
+  "99th Percentile Latency (microseconds)": 145553,
+  "75th Percentile Latency (microseconds)": 30033,
+  "Average Latency (microseconds)": 25917
+ },
+ "Throughput (requests/second)": 616.8825709898521,
+ "Goodput (requests/second)": 725.9991028103087
+}

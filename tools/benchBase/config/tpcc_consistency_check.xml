@@ -1,0 +1,97 @@
+<?xml version="1.0"?>
+<parameters>
+    <!-- 
+    ===================================================================
+    TPC-C 数据一致性校验专用配置文件
+    用途：在TPC-C压力测试完成后，检查数据库中的数据是否仍符合
+          TPC-C规范定义的12条一致性业务规则。
+    注意：此配置为只读检查，不会创建、加载或修改任何数据。
+          运行前请确保已成功完成压力测试且数据库状态未改变。
+    ===================================================================
+    -->
+    
+    <!-- ==================== [核心修改] 工作负载类型 ==================== -->
+    <!-- 
+    将此配置从压力测试 (tpcc) 切换为一致性检查器。
+    这是最重要的一步修改，告诉BenchBase执行不同的检查逻辑。
+    -->
+    <benchmark>tpcc-consistency-checker</benchmark>
+    
+    
+    <!-- ==================== 数据库连接配置 ==================== -->
+    <!-- 
+    此部分必须与压力测试配置文件完全一致，以确保连接到同一个数据库实例和数据集。
+    -->
+    <type>POSTGRES</type> <!-- 数据库类型：因为openGauss兼容PostgreSQL协议 -->
+    <driver>org.postgresql.Driver</driver> <!-- JDBC驱动类 -->
+    
+    <!-- 
+    数据库连接URL。
+    注意：将ApplicationName参数改为consistency-checker以在数据库侧区分连接。
+    其他参数（如sslmode）保持不变。
+    -->
+    <url>jdbc:postgresql://172.18.0.10:5432/benchbase_db?sslmode=disable&amp;ApplicationName=tpcc-consistency-checker&amp;reWriteBatchedInserts=true&amp;assumeMinServerVersion=9.0&amp;gssEncMode=disable</url>
+    <username>benchbase</username> <!-- 数据库用户名 -->
+    <password>benchbase@123</password> <!-- 数据库密码 -->
+    <reconnectOnConnectionFailure>true</reconnectOnConnectionFailure> <!-- 失败时自动重连 -->
+    
+    
+    <!-- ==================== 连接池与事务配置 ==================== -->
+    <isolation>TRANSACTION_READ_COMMITTED</isolation> <!-- 事务隔离级别，保持默认 -->
+    <!-- 
+    启用只读模式。一致性检查不会写入数据，此设置可优化数据库连接。
+    （部分驱动支持，如果报错可尝试注释掉此行）
+    -->
+    <readonly>true</readonly>
+    <batchsize>128</batchsize> <!-- 批处理大小，可保留原值 -->
+    
+    
+    <!-- ==================== [核心修改] 数据加载控制 ==================== -->
+    <!-- 
+    ！！！ 警告：以下两个参数必须设置为 false ！！！
+    create: 如果为true，会尝试创建表，可能因表已存在而报错。
+    load:   如果为true，会尝试加载初始数据，这将清空并覆盖现有测试数据，导致校验失败。
+    -->
+    <create>false</create>
+    <load>false</load>
+    
+    <!-- 
+    仓库数量。此值必须与压力测试时使用的 scalefactor 完全一致（例如都是10）。
+    校验器依赖此值确定需要检查的数据范围。
+    -->
+    <scalefactor>10</scalefactor>
+    
+    <!-- 
+    终端数。对于一致性检查，此参数不影响检查逻辑，因为检查是单线程进行的。
+    为减少连接开销，可以设置为1。
+    -->
+    <terminals>1</terminals>
+    
+    
+    <!-- ==================== [已移除/注释] 压力测试相关参数 ==================== -->
+    <!-- 
+    一致性检查是预定义的检查流程，不需要以下压力测试专用的执行参数。
+    建议注释或删除它们，使配置文件更清晰。
+    -->
+    <!--
+    <works>...</works>
+    <transactiontypes>...</transactiontypes>
+    -->
+    
+    
+    <!-- ==================== 结果收集配置 ==================== -->
+    <!-- 采样间隔（毫秒）。检查过程很快，保持默认即可。 -->
+    <measurementinterval>5000</measurementinterval>
+    <!-- 输出格式。JSON格式便于机器解析，推荐保留。 -->
+    <outputformat>json</outputformat>
+    <!-- 是否生成延迟直方图。对检查过程有意义，可保留。 -->
+    <histograms>true</histograms>
+    
+    
+    <!-- ==================== 高级选项 ==================== -->
+    <!-- 数据加载工作线程数。由于load=false，此参数不生效，可保留。 -->
+    <loaderThreads>4</loaderThreads>
+    <!-- 查询追踪文件。通常为空，除非需要深度调试。 -->
+    <tracefile></tracefile>
+    
+</parameters>

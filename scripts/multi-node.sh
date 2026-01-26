@@ -230,35 +230,6 @@ main() {
         exit 1
     fi
     
-    # 等待容器初始化完成并检查 Git 仓库来源
-    echo ""
-    echo "  等待容器初始化..."
-    
-    # 等待 init-container.sh 执行完成（检查 .git 目录和代码文件）
-    for i in {1..30}; do
-        if docker exec opengauss-primary bash -c 'test -f /home/README.md && test -d /home/.git' 2>/dev/null; then
-            break
-        fi
-        sleep 1
-    done
-    sleep 2  # 额外等待确保 git remote 设置完成
-    
-    # 从 primary 节点检查仓库来源
-    REPO_URL=$(docker exec opengauss-primary bash -c 'cd /home && git remote get-url origin 2>/dev/null || echo "unknown"')
-    
-    if [[ "$REPO_URL" == *"github.com"* ]]; then
-        echo -e "  ✓ 代码来源: ${GREEN}GitHub${NC} ($REPO_URL)"
-        echo -e "  📡 网络状态: 容器内可访问 GitHub"
-    elif [[ "$REPO_URL" == *"gitee.com"* ]]; then
-        echo -e "  ✓ 代码来源: ${YELLOW}Gitee 镜像${NC} ($REPO_URL)"
-        echo -e "  📡 网络状态: 容器内不可访问 GitHub，已使用国内镜像"
-    elif [[ "$REPO_URL" == "unknown" ]]; then
-        echo -e "  ⚠️  代码来源: ${YELLOW}未检测到 Git 仓库${NC}"
-    else
-        echo -e "  ✓ 代码来源: ${REPO_URL}"
-    fi
-    echo ""
-    
     # 步骤2: 配置SSH
     if ! execute_script 2 "02_setup_ssh.sh" "配置节点间 SSH 免密登录" ; then
         echo -e "${YELLOW}⚠ SSH配置失败，但继续部署${NC}"
@@ -296,11 +267,21 @@ main() {
     echo "  🔄 复制模式: ${REPLICATION_MODE}"
     
     # 显示仓库来源
+    # 从 primary 节点检查仓库来源
+    REPO_URL=$(docker exec opengauss-primary bash -c 'cd /home && git remote get-url origin 2>/dev/null || echo "unknown"')
+    
     if [[ "$REPO_URL" == *"github.com"* ]]; then
-        echo "  📦 代码来源: GitHub ($REPO_URL)"
+        echo -e "  ✓ 代码来源: ${GREEN}GitHub${NC} ($REPO_URL)"
+        echo -e "  📡 网络状态: 容器内可访问 GitHub"
     elif [[ "$REPO_URL" == *"gitee.com"* ]]; then
-        echo "  📦 代码来源: Gitee 镜像 ($REPO_URL)"
+        echo -e "  ✓ 代码来源: ${YELLOW}Gitee 镜像${NC} ($REPO_URL)"
+        echo -e "  📡 网络状态: 容器内不可访问 GitHub，已使用国内镜像"
+    elif [[ "$REPO_URL" == "unknown" ]]; then
+        echo -e "  ⚠️  代码来源: ${YELLOW}未检测到 Git 仓库${NC}"
+    else
+        echo -e "  ✓ 代码来源: ${REPO_URL}"
     fi
+    echo ""
     
     echo ""
     echo -e "${BLUE}快速操作命令:${NC}"

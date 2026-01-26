@@ -39,7 +39,7 @@ if [ ! -f "$INIT_SCRIPT" ]; then
 fi
 
 # 检查镜像
-IMAGE_NAME="xcg0/opengauss-openeuler_22.03:x86_64"
+IMAGE_NAME="xcg0/opengauss-openeuler_22.03:xlog_tools"
 if ! docker images -q $IMAGE_NAME | grep -q .; then
     echo "错误: 镜像不存在，请运行: docker pull $IMAGE_NAME"
     exit 1
@@ -97,7 +97,7 @@ MSYS_NO_PATHCONV=1 docker run -itd \
     --privileged=true \
     -p 127.0.0.1:15432:5432 \
     -v "${INIT_SCRIPT}:/home/init-container.sh:ro" \
-    xcg0/opengauss-openeuler_22.03:x86_64 \
+    xcg0/opengauss-openeuler_22.03:xlog_tools \
     bash /home/init-container.sh > /dev/null
 
 echo "✓"
@@ -119,7 +119,7 @@ for i in $(seq 1 $STANDBY_COUNT); do
         --privileged=true \
         -p 127.0.0.1:${STANDBY_PORT}:5432 \
         -v "${INIT_SCRIPT}:/home/init-container.sh:ro" \
-        xcg0/opengauss-openeuler_22.03:x86_64 \
+        xcg0/opengauss-openeuler_22.03:xlog_tools \
         bash /home/init-container.sh > /dev/null
     
     echo "✓"

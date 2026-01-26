@@ -106,11 +106,6 @@ docker exec $CONTAINER_NAME bash -c '
     cd /benchbase/src/target/$BENCHBASE_DIR
     cp -r * /benchbase/
     
-    # 删除源码目录
-    echo "[容器内] 删除源码和构建目录..."
-    cd /benchbase
-    rm -rf /benchbase/src
-    
     echo "[容器内] benchbase 部署完成"
     ls -lh /benchbase/
 '
@@ -134,8 +129,8 @@ docker exec $CONTAINER_NAME bash -c '
 ' > /dev/null 2>&1
 echo "[容器内] 清理完成"
 
-# 4. 打包成极简镜像
-echo "[主机] commit 极简镜像..."
+# 4. 打包成镜像
+echo "[主机] commit 镜像..."
 docker commit \
     --change='ENTRYPOINT [""]' \
     --change='CMD ["sleep", "infinity"]' \
@@ -146,7 +141,7 @@ docker commit \
 # docker rm -f $CONTAINER_NAME
 
 echo "========================================"
-echo "  极简镜像 xcg0/benchbase-opengauss:latest 构建完成!"
+echo "  镜像 xcg0/benchbase-opengauss:latest 构建完成!"
 echo "========================================"
 docker images | grep benchbase
 echo ""

@@ -101,8 +101,9 @@ docker run -d \
     -v "${CONFIG_DIR}:/benchbase/config" \
     -v "${RESULTS_DIR}:/benchbase/results" \
     --workdir /benchbase \
+    --entrypoint bash \
     ${BENCHBASE_IMAGE} \
-    sleep infinity
+    -c "while true; do sleep 3600; done"
 
 # 检查容器状态
 if docker ps --format '{{.Names}}' | grep -q "^${CONTAINER_NAME}$"; then

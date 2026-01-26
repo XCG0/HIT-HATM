@@ -309,7 +309,7 @@ def analyze_summary(summary_file: str, writer):
 def main():
     """主函数"""
     script_dir = os.path.dirname(os.path.abspath(__file__))
-    results_dir = os.path.join(script_dir, "results")
+    results_dir = os.path.join(script_dir, "")
 
     # 检查命令行参数
     if len(sys.argv) > 1:
