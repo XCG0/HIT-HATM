@@ -8,12 +8,12 @@ init-container.sh
 .vscode/extensions.json
 .vscode/launch.json
 
-!openGauss/openGauss-server/
-openGauss/openGauss-server/*
-!openGauss/openGauss-server/src
-openGauss/openGauss-server/src/*
+# !openGauss/openGauss-server/
+# openGauss/openGauss-server/*
+# !openGauss/openGauss-server/src
+# openGauss/openGauss-server/src/*
 
-!openGauss/openGauss-server/src/gausskernel
+# !openGauss/openGauss-server/src/gausskernel
 # openGauss/openGauss-server/src/gausskernel/*
 # !openGauss/openGauss-server/src/gausskernel/process
 # openGauss/openGauss-server/src/gausskernel/process/*
@@ -25,7 +25,7 @@ openGauss/openGauss-server/src/*
 # !openGauss/openGauss-server/src/gausskernel/storage
 # !openGauss/openGauss-server/src/gausskernel/optimizer
 
-!openGauss/openGauss-server/src/common
+# !openGauss/openGauss-server/src/common
 # openGauss/openGauss-server/src/common/*
 # !openGauss/openGauss-server/src/common/backend
 # openGauss/openGauss-server/src/common/backend/*

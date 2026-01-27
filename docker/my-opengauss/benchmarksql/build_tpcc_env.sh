@@ -28,7 +28,7 @@ function init_and_start_opengauss() {
   echo "[0/6] 检查并初始化/启动 openGauss 数据库服务..."
   if [ ! -d "$GAUSSHOME/data" ]; then
     echo "数据库目录不存在，开始初始化..."
-    su - omm -c "source ~/.bashrc && gs_initdb -D $GAUSSHOME/data --nodename=single_node --auth=sha256 --username=gaussdb --pw=$PG_PASS"
+    su - omm -c "source ~/.bashrc && gs_initdb -D $GAUSSHOME/data --nodename=single_node --auth=sha256 --username=gaussdb --pwpasswd=$PG_PASS"
   fi
   if ! ps -ef | grep gauss | grep -v grep >/dev/null; then
     su - omm -c "source ~/.bashrc && gs_ctl start -D $GAUSSHOME/data"
